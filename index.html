@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة تعليمية</title>
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍💻</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a; /* Slate 900 */
+            --bg-medium: #1e293b; /* Slate 800 */
+            --card-bg: rgba(30, 41, 59, 0.6); /* Slate 800 with alpha */
+            --card-hover-bg: rgba(51, 65, 85, 0.7); /* Slate 700 with alpha */
+            --border-color: rgba(20, 184, 166, 0.2); /* Teal 500 with alpha */
+            --border-hover: rgba(20, 184, 166, 0.5);
+            --primary-accent: #26095c; /* Teal 500 */
+            --primary-accent-dark: #0f0d94; /* Teal 600 */
+            --primary-accent-light: #0d1691; /* Teal 300 */
+            --text-main: #e2e8f0; /* Slate 200 */
+            --text-secondary: #94a3b8; /* Slate 400 */
+            --text-title: var(--primary-accent-light);
+            --success-bg: rgba(22, 163, 74, 0.2);
+            --success-text: #0c16a1;
+            --error-bg: rgba(220, 38, 38, 0.2);
+            --error-text: #f87171;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+        }
+        .main-bg {
+            background-image: radial-gradient(circle at top right, rgba(20, 184, 166, 0.2), transparent 40%),
+                              radial-gradient(circle at bottom left, rgba(13, 148, 136, 0.2), transparent 50%);
+            background-color: var(--bg-dark);
+        }
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            background-color: var(--card-hover-bg);
+            border-color: var(--border-hover);
+            box-shadow: 0 10px 25px rgba(13, 148, 136, 0.2);
+        }
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar-hidden {
+            transform: translateX(100%);
+        }
+        .nav-item {
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .nav-item:hover, .nav-item.active {
+            background-color: var(--primary-accent);
+            color: rgb(25, 11, 143);
+        }
+        .nav-item.active svg, .nav-item:hover svg {
+            color: white;
+        }
+        .glow-icon {
+             filter: drop-shadow(0 0 5px rgba(20, 184, 166, 0.7));
+        }
+        .info-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(5px);
+        }
+        .info-card h3 {
+            color: var(--text-title);
+            font-weight: 700;
+        }
+        .accordion-header {
+            background-color: var(--card-hover-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            cursor: pointer;
+            padding: 1rem;
+            width: 100%;
+            text-align: right;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .accordion-header:hover, .accordion-header.active {
+            background-color: var(--primary-accent);
+            color: white;
+        }
+        .accordion-header .arrow {
+            transition: transform 0.3s ease;
+        }
+        .accordion-header.active .arrow {
+            transform: rotate(180deg);
+        }
+        .accordion-content {
+            background-color: rgba(30, 41, 59, 0.4); /* Slate-800 with alpha */
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            border-radius: 0 0 0.5rem 0.5rem;
+            padding: 0 1.5rem;
+            color: var(--text-secondary);
+        }
+        .code-block {
+            background-color: #020617; /* Slate-950 */
+            border: 1px solid var(--border-color);
+            color: #e0e0e0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            direction: ltr;
+            text-align: left;
+            font-family: 'Courier New', Courier, monospace;
+            position: relative;
+        }
+        #splash-screen {
+            transition: opacity 1s ease-in-out;
+        }
+        .quiz-option {
+            background-color: var(--card-hover-bg);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 8px;
+            border: 1px solid transparent;
+        }
+        .quiz-option:hover {
+             background-color: var(--primary-accent-dark);
+            border-color: var(--border-hover);
+        }
+        .quiz-option.correct {
+            background-color: #16a34a !important;
+            color: rgb(8, 35, 155);
+            font-weight: bold;
+        }
+        .quiz-option.incorrect {
+            background-color: #dc2626 !important;
+            color: rgb(17, 48, 133);
+            font-weight: bold;
+        }
+        
+        /* Progress Bar Styles */
+        .progress-bar-container {
+            background-color: var(--bg-medium);
+            border-radius: 9999px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #14b8a6, #5eead4);
+            transition: width 0.5s ease-in-out;
+        }
+       
+        /* Flashcard Styles */
+        .flashcard-container {
+            perspective: 1000px;
+            width: 300px;
+            height: 200px;
+        }
+
+        .flashcard {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .flashcard.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 1rem;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .flashcard-front {
+            transform: rotateY(0deg);
+        }
+
+        .flashcard-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Custom alert/notification styles */
+        .custom-alert {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background-color: var(--primary-accent);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        .custom-alert.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Skill Tree Styles */
+        .skill-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .skill-branch {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            position: relative;
+        }
+        .skill-node {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 0.75rem;
+            padding: 5px;
+            border: 2px solid var(--border-color);
+            background-color: var(--card-bg);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
+        .skill-node .node-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+        .skill-node.unlocked {
+            cursor: pointer;
+        }
+        .skill-node.unlocked:hover {
+            transform: scale(1.1);
+            border-color: var(--border-hover);
+            background-color: var(--card-hover-bg);
+        }
+        .skill-node.completed {
+            background-color: var(--success-bg);
+            border-color: var(--success-text);
+            color: var(--success-text);
+        }
+        .skill-node.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+        .skill-connector {
+            position: absolute;
+            height: 2px;
+            background-color: var(--border-color);
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        .connector-horizontal {
+            width: 30px;
+        }
+        .connector-vertical {
+            width: 2px;
+            height: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center bg-slate-900 z-[100]">
+        <div class="text-center text-teal-300">
+            <h1 class="text-4xl font-bold mb-4">سبحان الله وبحمده سبحان الله العظيم</h1>
+            <p class="text-2xl">لا تنس الصلاة على النبي: صلى الله عليه وسلم</p>
+        </div>
+    </div>
+
+    <!-- Custom Alert/Notification -->
+    <div id="custom-alert" class="custom-alert"></div>
+
+    <div class="flex min-h-screen main-bg">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed top-0 right-0 h-full bg-slate-900/80 backdrop-blur-lg w-64 p-6 shadow-2xl z-50 sidebar-hidden md:relative md:transform-none md:shadow-none">
+            <div class="flex justify-between items-center mb-10">
+                <h1 class="text-3xl font-bold text-teal-400">صلي علي النبي</h1>
+                <button id="close-sidebar" class="md:hidden text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <nav id="main-nav">
+                <ul>
+                    <li class="mb-3">
+                        <a href="#" class="nav-item active flex items-center p-3 rounded-lg" data-view="main-view">
+                            <svg class="w-6 h-6 ml-4 text-teal-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>
+                            <span>💻 تعلم البرمجة</span>
+                        </a>
+                    </li>
+                    <li class="mb-3">
+                        <a href="#" class="nav-item flex items-center p-3 rounded-lg" data-view="english-general-view">
+                            <svg class="w-6 h-6 ml-4 text-teal-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 4.874 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C13.18 7.061 14.289 7.5 15.5 7.5c1.21 0 2.32-.439 3.334-1.136m-1.996.001v2.625" /></svg>
+                             <span>🌍 تعلم الإنجليزية</span>
+                        </a>
+                    </li>
+                     <li class="mb-3">
+                        <a href="#" class="nav-item flex items-center p-3 rounded-lg" data-view="projects-view">
+                           <svg class="w-6 h-6 ml-4 text-teal-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.572L16.5 21.75l-.398-1.178a3.375 3.375 0 00-2.455-2.456L12.75 18l1.178-.398a3.375 3.375 0 002.455-2.456L16.5 14.25l.398 1.178a3.375 3.375 0 002.456 2.456L20.25 18l-1.178.398a3.375 3.375 0 00-2.456 2.456z"/></svg>
+                            <span>🏗️ المشاريع</span>
+                        </a>
+                    </li>
+                     <li class="mb-3">
+                        <a href="#" class="nav-item flex items-center p-3 rounded-lg" data-view="learning-path-view">
+                           <svg class="w-6 h-6 ml-4 text-teal-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-1.007 1.11-1.226M10.343 3.94a3.75 3.75 0 01-5.714 0m5.714 0a3.75 3.75 0 00-5.714 0M12 21v-1.5M12 3v-1.5m0 0l-1.14.995a3.75 3.75 0 00-1.71 3.295V8.25m3-3.75L13.14.995a3.75 3.75 0 011.71 3.295V8.25m-3-3.75a3.75 3.75 0 00-5.714 0" /></svg>
+                            <span>🌳 شجرة المهارات</span>
+                        </a>
+                    </li>
+                     <li class="mb-3">
+                        <a href="#" class="nav-item flex items-center p-3 rounded-lg" data-view="career-prep-view">
+                           <svg class="w-6 h-6 ml-4 text-teal-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+                            <span>💼 الإعداد الوظيفي</span>
+                        </a>
+                    </li>
+                    <li class="mb-3">
+                        <a href="#" class="nav-item flex items-center p-3 rounded-lg" data-view="community-view">
+                           <svg class="w-6 h-6 ml-4 text-teal-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-7.512 2.72a3 3 0 01-4.682-2.72 9.094 9.094 0 013.741-.479m7.512 2.72c-1.247 1.02-3.071 1.02-4.318 0M12 12a3 3 0 100-6 3 3 0 000 6z" /></svg>
+                            <span>👥 المجتمع</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8">
+            <header class="flex justify-between items-center mb-8">
+                <!-- Empty div for spacing, to push the button to the right -->
+                <div></div>
+                <div>
+                     <button id="open-sidebar" class="md:hidden p-2 rounded-md text-gray-400 hover:bg-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                </div>
+            </header>
+            
+            <div id="main-view" class="view">
+                 <!-- Web Technologies Section -->
+                <section id="web-dev">
+                    <div class="flex items-center mb-6">
+                        <svg class="w-8 h-8 text-teal-400 ml-3 glow-icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>
+                        <h2 class="text-2xl font-bold">🌐 لغات وتقنيات الويب</h2>
+                    </div>
+                    <div id="web-dev-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
+                </section>
+                
+            </div>
+
+            <!-- Details Section (Populated by JS) -->
+            <section id="details-view" class="hidden view">
+                 <button class="back-button mb-6 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center" data-target="main-view">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span>العودة</span>
+                </button>
+                <div id="details-content"></div>
+            </section>
+            
+              <!-- Projects Section -->
+            <section id="projects-view" class="hidden view">
+                 <button class="back-button mb-6 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center" data-target="main-view">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span>العودة</span>
+                </button>
+                 <div class="flex items-center mb-6">
+                    <span class="text-5xl ml-3">🏗️</span>
+                    <h2 class="text-3xl font-bold">مشاريع تطبيقية</h2>
+                </div>
+                <div id="projects-list" class="space-y-4"></div>
+            </section>
+
+              <!-- Code Playground Section -->
+            <section id="playground-view" class="hidden view">
+                <button class="back-button mb-6 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center" data-target="details-view">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span>العودة للدرس</span>
+                </button>
+                 <div id="code-playground" class="space-y-4">
+                    <h3 class="text-2xl font-bold text-teal-300">مختبر الكود</h3>
+                    <div id="playground-editors" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <textarea id="html-editor" class="bg-slate-800 text-white p-4 rounded-lg h-64 md:h-96" placeholder="HTML"></textarea>
+                        <textarea id="css-editor" class="bg-slate-800 text-white p-4 rounded-lg h-64 md:h-96" placeholder="CSS"></textarea>
+                        <textarea id="js-editor" class="bg-slate-800 text-white p-4 rounded-lg h-64 md:h-96" placeholder="JavaScript"></textarea>
+                    </div>
+                     <div class="flex justify-center">
+                         <button id="run-code" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg">تشغيل الكود</button>
+                     </div>
+                    <div id="playground-output" class="bg-white rounded-lg p-2 h-96">
+                        <iframe id="playground-output-iframe" title="Output" class="w-full h-full border-none"></iframe>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Learning Path Section -->
+            <section id="learning-path-view" class="hidden view">
+                 <button class="back-button mb-6 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center" data-target="main-view">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span>العودة</span>
+                </button>
+                 <div class="flex items-center mb-6">
+                    <span class="text-5xl ml-3">🌳</span>
+                    <h2 class="text-3xl font-bold">شجرة المهارات</h2>
+                </div>
+
+                <div class="info-card mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xl">ملخص تقدمك</h3>
+                            <p class="text-gray-400">أكمل الدروس لفتح فروع جديدة!</p>
+                        </div>
+                         <div class="text-center">
+                            <div id="daily-streak" class="text-3xl font-bold text-amber-400">🔥 0</div>
+                            <div class="text-sm">إنجاز يومي</div>
+                        </div>
+                        <div class="text-center">
+                            <div id="xp-count" class="text-3xl font-bold text-teal-300">0</div>
+                            <div class="text-sm">نقطة خبرة</div>
+                        </div>
+                        <div class="text-center">
+                            <div id="badges-count" class="text-3xl">🏅 0</div>
+                            <div class="text-sm">شارات</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="skill-tree-container" class="space-y-8"></div>
+            </section>
+            
+              <!-- General English Learning Section -->
+            <section id="english-general-view" class="hidden view">
+                <button class="back-button mb-6 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center" data-target="main-view">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span>العودة</span>
+                </button>
+                 <div class="flex items-center mb-6">
+                    <span class="text-5xl ml-3">🌍</span>
+                    <h2 class="text-3xl font-bold">عزز مهاراتك في اللغة الإنجليزية</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                    <a href="#" class="category-card p-4 rounded-lg text-center hover:bg-slate-700 transition-colors" data-subview="english-grammar-accordions">
+                        <span class="text-4xl">📘</span><h4 class="font-bold mt-2">القواعد</h4>
+                    </a>
+                     <a href="#" class="category-card p-4 rounded-lg text-center hover:bg-slate-700 transition-colors" data-subview="english-general-accordions">
+                        <span class="text-4xl">📖</span><h4 class="font-bold mt-2">الكلمات</h4>
+                    </a>
+                    <a href="#" class="category-card p-4 rounded-lg text-center hover:bg-slate-700 transition-colors" data-nav-view="listening-view">
+                        <span class="text-4xl">🎧</span><h4 class="font-bold mt-2">استماع</h4>
+                    </a>
+                    <a href="#" class="category-card p-4 rounded-lg text-center hover:bg-slate-700 transition-colors" data-nav-view="flashcards-view">
+                        <span class="text-4xl">🗂️</span><h4 class="font-bold mt-2">بطاقات</h4>
+                    </a>
+                    <a href="#" class="category-card p-4 rounded-lg text-center hover:bg-slate-700 transition-colors" data-nav-view="idioms-view">
+                        <span class="text-4xl">💡</span><h4 class="font-bold mt-2">مصطلحات</h4>
+                    </a>
+                </div>
+                
+                 <div class="info-card english-sub-view" id="english-grammar-accordions-container">
+                    <h3 class="text-xl mb-4">📘 أساسيات قواعد اللغة الإنجليزية</h3>
+                    <div id="english-grammar-accordions" class="space-y-2"></div>
+                </div>
+
+                 <div class="info-card english-sub-view hidden" id="english-general-accordions-container">
+                    <h3 class="text-xl mb-4">📖 الكلمات الشائعة</h3>
+                    <div class="space-y-2" id="english-general-accordions"></div>
+                </div>
+            </section>
+            
+            <!-- Listening Section -->
+            <section id="listening-view" class="hidden view">
+                 <button class="back-button mb-6 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center" data-target="english-general-view">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span>العودة</span>
+                </button>
+                <div class="flex items-center mb-6">
+                    <span class="text-5xl ml-3">🎧</span>
+                    <h2 class="text-3xl font-bold">تمارين الاستماع</h2>
+                </div>
+                <div id="listening-exercises" class="space-y-6"></div>
+            </section>
+
+              <!-- Flashcards Section -->
+            <section id="flashcards-view" class="hidden view">
+                 <button class="back-button mb-6 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center" data-target="english-general-view">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span>العودة</span>
+                </button>
+                <div class="flex flex-col items-center">
+                    <h2 class="text-3xl font-bold mb-4">🗂️ بطاقات تعليمية</h2>
+                    <div class="mb-6">
+                        <select id="flashcard-category" class="bg-slate-700 border border-teal-500/50 rounded-lg p-2"></select>
+                    </div>
+                    <div id="flashcard-container" class="flashcard-container mb-6">
+                        <div id="flashcard" class="flashcard">
+                            <div id="flashcard-front" class="flashcard-face flashcard-front"></div>
+                            <div id="flashcard-back" class="flashcard-face flashcard-back"></div>
+                        </div>
+                    </div>
+                    <button id="next-flashcard" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg">البطاقة التالية</button>
+                </div>
+            </section>
+            
+            <!-- Idioms Section -->
+            <section id="idioms-view" class="hidden view">
+                <button class="back-button mb-6 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center" data-target="english-general-view">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span>العودة</span>
+                </button>
+                 <div class="flex items-center mb-6">
+                    <span class="text-5xl ml-3">💡</span>
+                    <h2 class="text-3xl font-bold">مصطلحات إنجليزية شائعة</h2>
+                </div>
+                 <div class="info-card">
+                    <div id="idioms-content" class="space-y-2"></div>
+                </div>
+            </section>
+            
+             <!-- Career Prep Section -->
+            <section id="career-prep-view" class="hidden view">
+                 <button class="back-button mb-6 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center" data-target="main-view">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span>العودة</span>
+                </button>
+                 <div class="flex items-center mb-6">
+                    <span class="text-5xl ml-3">💼</span>
+                    <h2 class="text-3xl font-bold">الإعداد الوظيفي</h2>
+                </div>
+                <div id="career-prep-content" class="space-y-4"></div>
+            </section>
+
+
+              <!-- Community Section -->
+            <section id="community-view" class="hidden view">
+                 <button class="back-button mb-6 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center" data-target="main-view">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span>العودة</span>
+                </button>
+                <div class="info-card text-center">
+                    <img src="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.svg" alt="Discord Logo" class="w-24 h-24 mx-auto mb-4">
+                    <h3 class="text-2xl mb-2">انضم إلى مجتمعنا على ديسكورد!</h3>
+                    <p class="mb-6 text-gray-400">تواصل مع مطورين آخرين، شارك مشاريعك، واحصل على المساعدة في رحلتك البرمجية.</p>
+                    <a href="https://discord.gg/TzjAXh7XNX" target="_blank" rel="noopener noreferrer" class="inline-block bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform hover:scale-105">
+                        🚀 انضم الآن
+                    </a>
+                </div>
+            </section>
+            
+            <footer class="text-center text-gray-400 mt-16 text-sm">
+                <p class="mt-2">© akroub-core 2025. جميع الحقوق محفوظة.</p>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+             // --- Splash Screen Logic ---
+            const splashScreen = document.getElementById('splash-screen');
+            if (splashScreen) {
+                setTimeout(() => {
+                    splashScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        splashScreen.style.display = 'none';
+                    }, 1000); 
+                }, 2500);
+            }
+            
+            // --- DATA DEFINITIONS ---
+            const webTech = ['HTML', 'CSS', 'JavaScript', 'TypeScript', 'React', 'Angular', 'Node.js', 'Python', 'PHP', 'C#'];
+            const techSVGs = {
+                'HTML': `<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" fill="#E34F26"><title>HTML5</title><path d="M1.5 0h21l-1.91 21.563L11.977 24l-8.565-2.438L1.5 0zm7.031 9.75l-.232-2.718 10.059.003.23-2.622-13.21.002.69 7.842h11.385l-.475 5.325-3.515 1.004-3.516-1.004-.24-2.603h-2.617l.462 5.153L12 20.44l5.459-1.55.76-8.541H8.531z"/></svg>`,
+                'CSS': `<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" fill="#1572B6"><title>CSS3</title><path d="m1.5 0h21l-1.91 21.563-8.583 2.437-8.565-2.438-1.942-21.562zm16.931 6.313h-12.4l.323 3.44h11.754l-.323 3.441-4.049 1.116-4.05-1.116-.202-2.228h-3.32l.444 4.881 7.132 1.976 7.13-1.976.953-10.554h-12.4l-.201-2.22h16.026l-.953 10.55z"/></svg>`,
+                'JavaScript': `<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-9 h-9" fill="#F7DF1E"><title>JavaScript</title><path d="M0 0h24v24H0V0zm22.034 18.276c-.175-1.095-.82-2.25-2.033-3.124-.304-.218-.608-.42-1.01-.638v-2.327a5.245 5.245 0 00.404-.478c.89-.982.868-2.25.868-2.25s.109-1.433-.944-2.138c-1.053-.705-2.72-.455-2.72-.455s-1.112.08-1.574.637c-.462.558-.38 1.488-.38 1.488s-.036 1.25.733 2.138a2.19 2.19 0 011.01.944v4.545c0 .272-.218.49-.49.49h-2.056c-.272 0-.49-.218-.49-.49v-4.82c0-1.488-1.748-2.422-2.828-1.574-.752.603-1.01 1.765-1.01 1.765s-.254 1.41.982 2.174c1.235.768 2.72.42 2.72.42s.787-.095 1.236-.674c.45-.578.362-1.343.362-1.343s.057-1.033-.674-1.765a2.19 2.19 0 00-1.01-.81v-2.63c-.109.076-.218.152-.327.232-1.076.787-1.468 2.25-1.468 2.25s-.345 1.574 1.13 2.508c1.474.93 3.535.562 3.535.562s1.45-.19 2.213-1.03c.764-.84.69-2.016.69-2.016s-.04-1.25-.69-1.92c-.65-.67-1.92-.81-1.92-.81H5.87c.254.674.71 1.11 1.255 1.343.545.232 1.18.21 1.743.15.56-.06 1.12-.19 1.63-.4s1.02-.51 1.46-.92c.44-.41.79-.92 1.05-1.52.26-.6.43-1.27.5-2.01.07-.74.03-1.5-.12-2.28-.15-.78-.42-1.55-.81-2.28-.39-.73-.9-1.42-1.52-2.05-.62-.63-1.34-1.18-2.15-1.64C8.92 1.45 7.99 1.1 7 1.02c-.99-.08-1.98.03-2.94.34-1.18.37-2.26.98-3.15 1.87-.89.89-1.58 1.95-2.03 3.12-.45 1.17-.68 2.4-.68 3.65 0 1.25.23 2.48.68 3.65.45 1.17 1.14 2.23 2.03 3.12.89.89 1.97 1.58 3.15 1.95.96.31 1.95.42 2.94.34.99-.08 1.92-.43 2.77-1 .85-.57 1.59-1.29 2.15-2.15.56-.86.94-1.81 1.12-2.82h-2.327c-.235 0-.45-.109-.6-.29-.15-.18-.23-.41-.23-.65 0-.525.43-.95.95-.95h3.52c.04 0 .07 0 .1 0 .235 0 .45.11.6.29.15.18.23.41.23.65 0 .86-.18 1.7-.52 2.48-.34.78-.83 1.48-1.45 2.08-.62.6-1.37 1.1-2.22 1.45-.85-.35-1.78.53-2.74.53-.96 0-1.89-.18-2.74-.53-.85-.35-1.6-.85-2.22-1.45-.62-.6-1.11-1.3-1.45-2.08-.34-.78-.52-1.62-.52-2.48 0-.86.18-1.7.52-2.48.34-.78.83-1.48 1.45-2.08.62-.6 1.37-1.1 2.22-1.45C8.36 3.03 9.3 2.85 10.26 2.9c.96.05 1.89.3 2.74.75.85.45 1.6.11 2.22 1.85.62.75 1.11 1.59 1.45 2.52.34.93.52 1.91.52 2.9h.004z"/></svg>`,
+                'Python': `<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" fill="#3776AB"><title>Python</title><path d="M11.25 15.659c-1.168.423-2.193.99-3.02 1.698a.5.5 0 00-.115.666l.36.625a.5.5 0 00.666.115c.87-.745 1.93-1.332 3.12-1.758a.5.5 0 00.25-.615l-.291-.65a.5.5 0 00-.616-.25zm1.5-1.318c-1.168.423-2.193.99-3.02 1.698a.5.5 0 00-.115.666l.36.625a.5.5 0 00.666.115c.87-.745 1.93-1.332 3.12-1.758a.5.5 0 00.25-.615l-.291-.65a.5.5 0 00-.616-.25zM12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1.04 15.523c-1.558 0-2.82-1.262-2.82-2.82s1.262-2.82 2.82-2.82 2.82 1.262 2.82 2.82-1.262 2.82-2.82 2.82zm8.01-6.493c-1.558 0-2.82-1.262-2.82-2.82s1.262-2.82 2.82-2.82 2.82 1.262 2.82 2.82-1.262 2.82-2.82 2.82z"/></svg>`,
+                'TypeScript': `<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-9 h-9" fill="currentColor" style="color: #3178C6;"><title>TypeScript</title><path d="M1.5 0h21v21H1.5z" fill="#3178c6"/><path d="M11.08 15.31v-5.9h2.808l2.808-2.808h-2.14V4.93H4.282v4.56h2.14v4.56l2.808 2.808-2.808 2.808H4.282v4.56h11.24v-4.56h-2.14l-2.3-2.3zM10.02 4.93h2.14v4.56h-2.14V4.93zm0 15.508h2.14v-4.56h-2.14v4.56z" fill="#fff"/></svg>`,
+                'React': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-11.5 -10.23174 23 20.46348" class="w-10 h-10" fill="none" stroke="#61DAFB"><title>React</title><circle cx="0" cy="0" r="2.05" fill="#61DAFB"/><g stroke-width="1"><ellipse rx="11" ry="4.2"/><ellipse rx="11" ry="4.2" transform="rotate(60)"/><ellipse rx="11" ry="4.2" transform="rotate(120)"/></g></svg>`,
+                'Angular': `<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" fill="#DD0031"><title>Angular</title><path d="M12 0L1.608 3.42l1.732 13.06L12 24l8.66-7.52 1.732-13.06L12 0zm5.12 15.38H6.88L12 5.2l5.12 10.18z"/></svg>`,
+                'Node.js': `<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" fill="#339933"><title>Node.js</title><path d="M11.97 0v9.55l-5.46 3.16-5.46-3.16v-6.3L11.97 0zm.06 10.27l5.46 3.16v6.31l-5.46 3.16-5.46-3.16v-6.31l5.46-3.16z"/></svg>`,
+                'PHP': `<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" fill="#777BB4"><title>PHP</title><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-1.5 18h-2.25l-1-4.5h2.5l-.25 1.5h-1.5l.25-1.5h1.75l.5-2.5h-2.5l-.25 1.5h-1.5l.25-1.5h4.25l-1 6zm3.75-1.5c-.828 0-1.5-.672-1.5-1.5s.672-1.5 1.5-1.5 1.5.672 1.5 1.5-.672 1.5-1.5 1.5zm2.25-3c-.828 0-1.5-.672-1.5-1.5s.672-1.5 1.5-1.5 1.5.672 1.5 1.5-.672 1.5-1.5 1.5z"/></svg>`,
+                'C#': `<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" fill="#512BD4"><title>C Sharp</title><path d="M13.14 4.3 1.13-1.13a.4.4 0 0 0 0-.57l-1.13-1.13a.4.4 0 0 0-.57 0L11.44 2.6c-1.39-.23-2.84-.23-4.23 0L6.08 1.47a.4.4 0 0 0-.57 0L4.38 2.6a.4.4 0 0 0 0 .57l1.13 1.13c-.23 1.4-.23 2.84 0 4.24L4.38 9.67a.4.4 0 0 0 0 .57l1.13 1.13a.4.4 0 0 0 .57 0l1.13-1.13c1.4.23 2.84.23 4.24 0l1.13 1.13a.4.4 0 0 0 .57 0l1.13-1.13a.4.4 0 0 0 0-.57l-1.13-1.13c.23-1.4.23-2.85 0-4.24Zm-1.4 5.37h-1.4v1.4h1.4v-1.4Zm0-2.83h-1.4v1.4h1.4V6.84Z M22.61.12a.4.4 0 0 0-.57 0l-1.13 1.13a.4.4 0 0 0 0 .57l1.13 1.13a.4.4 0 0 0 .57 0l1.13-1.13a.4.4 0 0 0 0-.57L22.61.12Zm0 5.66a.4.4 0 0 0-.57 0l-1.13 1.13a.4.4 0 0 0 0 .57l1.13 1.13a.4.4 0 0 0 .57 0l1.13-1.13a.4.4 0 0 0 0-.57l-1.13-1.13Z M19.78 2.95a.4.4 0 0 0-.57 0l-1.13 1.13a.4.4 0 0 0 0 .57l1.13 1.13a.4.4 0 0 0 .57 0l1.13-1.13a.4.4 0 0 0 0-.57l-1.13-1.13Zm0 5.66a.4.4 0 0 0-.57 0l-1.13 1.13a.4.4 0 0 0 0 .57l1.13 1.13a.4.4 0 0 0 .57 0l1.13-1.13a.4.4 0 0 0 0-.57l-1.13-1.13Z"/></svg>`,
+            };
+            const techDetails = {
+                'HTML': {title: 'كل ما تريد معرفته عن HTML',icon: '🧡',introduction: 'HTML (HyperText Markup Language) هي اللغة القياسية لإنشاء صفحات الويب. تحدد هيكل ومحتوى صفحة الويب باستخدام مجموعة من العناصر (Elements) والوسوم (Tags).',usage: 'أساس بناء جميع مواقع وتطبيقات الويب. يوفر JavaScript التفاعلية و CSS يوفر التصميم، بينما HTML توفر الهيكل والمحتوى.',roadmap: [{ title: 'الأساسية: HTML فهرسية مستند', content: 'تعلم الأجزاء الأساسية لكل مستند HTML مثل &lt;!DOCTYPE html&gt;, &lt;html&gt;, &lt;head&gt;, &lt;body&gt;, و meta tags لوضع المعلومات الوصفية.' },{ title: 'العناصر الشائعة', content: 'تعرف على العناصر الأكثر استخدامًا مثل العناوين (&lt;h1&gt; إلى &lt;h6&gt;), الفقرات (&lt;p&gt;), الروابط (&lt;a&gt;), الصور (&lt;img&gt;), القوائم (&lt;ul&gt;, &lt;ol&gt;), والجداول (&lt;table&gt;).' },{ title: '(Semantic HTML5 tags) أوسوم الدلالية', content: 'مهمة لتحسين بنية الصفحة ومحركات البحث. تشمل &lt;header&gt;, &lt;nav&gt;, &lt;main&gt;, &lt;section&gt;, &lt;article&gt;, &lt;footer&gt;, و &lt;aside&gt;.' }],codeExamples: [{ title: 'أساسي هيكل صفحة HTML', type: 'html', code: `<!DOCTYPE html>\n<html lang="ar">\n<head>\n  <meta charset="UTF-8">\n  <title>عنوان الصفحة</title>\n</head>\n<body>\n  <h1>مرحبًا بالعالم!</h1>\n</body>\n</html>` },{ title: 'نموذج بسيط', type: 'html', code: `<form action="/submit-form" method="post">\n  <label for="name">الاسم:</label><br>\n  <input type="text" id="name" name="name"><br>\n  <input type="submit" value="إرسال">\n</form>` }], challenge: { id: 'html_basics', title: 'تحدي HTML', description: 'أنشئ قائمة غير مرتبة (unordered list) تحتوي على ثلاثة من الفواكه المفضلة لديك.', solution: `<ul>\n  <li>تفاح</li>\n  <li>موز</li>\n  <li>فراولة</li>\n</ul>`}, youtubeCourses: [{ channel: 'Elzero Web School', title: 'HTML Course For Beginners', link: 'https://www.youtube.com/watch?v=6QAELgirvjs&list=PLDoPjvoNmBAw_t_XWUFbBX-c9MafPk9ji', imgText: 'شرح HTML كامل للمبتدئين' },{ channel: 'SuperSimpleDev', title: 'شرح HTML كامل للمبتدئين', link: 'https://www.youtube.com/watch?v=G3e-cpL7ofc', imgText: 'SuperSimpleDev' }]},
+                'CSS': {title: 'كل ما تريد معرفته عن CSS',icon: '💙',introduction: 'CSS (Cascading Style Sheets) هي لغة تستخدم لوصف مظهر وتنسيق مستند مكتوب بلغة ترميز مثل HTML. هي المسؤولة عن الألوان والخطوط والتخطيط.',usage: 'تستخدم لتصميم وتخطيط صفحات الويب. يمكن استخدامها لإنشاء تخطيطات متجاوبة تتكيف مع أحجام الشاشات المختلفة، وتطبيق الرسوم المتحركة والتأثيرات البصرية.',roadmap: [{ title: 'الأساسيات والمحددات', content: 'تعلم كيفية عمل CSS والمحددات الأساسية (Selectors) مثل تحديد العناصر بالاسم، الفئة (class)، والمعرف (id).' },{ title: 'Box Model', content: 'فهم نموذج الصندوق (Box Model) الذي يصف كيفية حساب أبعاد العناصر (margin, border, padding, content).' },{ title: 'Flexbox & Grid', content: 'إتقان Flexbox و CSS Grid لإنشاء تخطيطات معقدة ومتجاوبة بسهولة.' }],codeExamples: [{ title: 'تغيير لون نص', type: 'css', code: `p {\n  color: blue;\n}` },{ title: 'مثال على Flexbox', type: 'css', code: `.container {\n  display: flex;\n  justify-content: space-around;\n}` }], challenge: { id: 'css_basics', title: 'تحدي CSS', description: 'اكتب قاعدة CSS لجعل كل الفقرات (p) باللون الأحمر وحجم خط 18 بكسل.', solution: `p {\n  color: red;\n  font-size: 18px;\n}`}, youtubeCourses: [{ channel: 'Elzero Web School', title: 'CSS Course For Beginners', link: 'https://www.youtube.com/watch?v=X1ulCwyhCVM&list=PLDoPjvoNmBAzjsz06gkzlSrlev53MGIKe', imgText: 'Elzero Web School' }]},
+                'JavaScript': {title: 'كل ما تريد معرفته عن JavaScript',icon: '💛',introduction: 'JavaScript هي لغة برمجة عالية المستوى وديناميكية تجعل صفحات الويب تفاعلية. هي واحدة من التقنيات الأساسية للويب.',usage: 'تستخدم لإضافة التفاعل إلى مواقع الويب، وبناء تطبيقات الويب من جانب العميل (Frontend) والخادم (Backend) باستخدام Node.js، وتطوير تطبيقات الموبايل والألعاب.',roadmap: [{ title: 'الأساسيات والمتغيرات', content: 'تعلم أساسيات اللغة مثل المتغيرات، أنواع البيانات، العوامل، والشروط.' },{ title: 'التعامل مع DOM', content: 'فهم كيفية التفاعل مع Document Object Model (DOM) لتغيير محتوى وهيكل صفحة الويب ديناميكيًا.' },{ title: 'ES6+', content: 'تعلم الميزات الحديثة في JavaScript مثل Arrow Functions, Promises, async/await.' }],codeExamples: [{ title: 'طباعة رسالة', type: 'js', code: `console.log('Hello, World!');` },{ title: 'تغيير عنصر HTML', type: 'js', code: `document.getElementById('demo').innerHTML = 'Hello JavaScript!';` }], challenge: { id: 'js_basics', title: 'تحدي JavaScript', description: 'اكتب دالة تأخذ رقمين كمدخلات وترجع مجموعهما.', solution: `function sum(a, b) {\n  return a + b;\n}`}, youtubeCourses: [{ channel: 'Elzero Web School', title: 'JavaScript Course', link: 'https://www.youtube.com/watch?v=GM6dQBmc-Xg&list=PLDoPjvoNmBAx3kiplQR_oeDqLDBUDYwVv', imgText: 'Elzero Web School' }]},
+                'Python': {title: 'كل ما تريد معرفته عن Python',icon: '🐍',introduction: 'Python هي لغة برمجة متعددة الاستخدامات، سهلة القراءة والكتابة. تشتهر ببساطتها وقوتها في نفس الوقت.',usage: 'تستخدم في تطوير الويب (باستخدام أطر عمل مثل Django و Flask)، تحليل البيانات، الذكاء الاصطناعي، تعلم الآلة، التشغيل الآلي للمهام (Automation) وغيرها.',roadmap: [{ title: 'أساسيات Python', content: 'تعلم القواعد الأساسية للغة، بما في ذلك المتغيرات، أنواع البيانات، الحلقات التكرارية، والدوال.' },{ title: 'هياكل البيانات', content: 'فهم هياكل البيانات المدمجة مثل القوائم (Lists)، القواميس (Dictionaries)، المجموعات (Sets)، و Tuples.' },{ title: 'البرمجة كائنية التوجه (OOP)', content: 'تعلم مفاهيم OOP مثل الفئات (Classes) والكائنات (Objects) لتنظيم الكود بشكل أفضل.' }],codeExamples: [{ title: 'طباعة رسالة', type: 'python', code: `print("Hello, Python!")` },{ title: 'حلقة تكرارية بسيطة', type: 'python', code: `for i in range(5):\n    print(i)` }], challenge: { id: 'python_basics', title: 'تحدي Python', description: 'اكتب برنامجًا يطبع الأرقام من 1 إلى 10.', solution: `for i in range(1, 11):\n    print(i)`}, youtubeCourses: [{ channel: 'FreeCodeCamp.org', title: 'Python for Beginners', link: 'https://www.youtube.com/watch?v=eWRfhZUzrAc&list=PLWKjhJtqVAbnqBxcdjVGgT3uVR10bzTEB', imgText: 'FreeCodeCamp' }]},
+                'TypeScript': { title: 'كل ما تريد معرفته عن TypeScript', icon: '📘', introduction: 'TypeScript هي مجموعة شاملة (superset) من JavaScript تضيف ميزات اختيارية مثل الأنواع الثابتة.', usage: 'تُستخدم بشكل أساسي لتحسين جودة الكود وزيادة الإنتاجية في المشاريع الكبيرة.', roadmap: [{ title: 'فهم الأنواع الثابتة', content: 'تعرف على الأنواع الأساسية مثل `string`, `number`, `boolean`.' }, { title: 'الواجهات (Interfaces)', content: 'استخدم الواجهات لتعريف شكل الكائنات.' }], codeExamples: [{ title: 'دالة بسيطة مع أنواع', type: 'ts', code: `function greet(name: string): string {\n  return \`مرحباً, \${name}!\`;\n}` }], challenge: { id: 'ts_basics', title: 'تحدي TypeScript', description: 'أنشئ واجهة (Interface) لـ `User` تحتوي على `id` (رقم) و `name` (نص).', solution: `interface User {\n  id: number;\n  name: string;\n}` }, youtubeCourses: [{ channel: 'Elzero Web School', title: 'TypeScript Course', link: 'https://www.youtube.com/watch?v=yUndnE-2osg&list=PLDoPjvoNmBAy532K9M_fjiAmrJ0gkCyLJ', imgText: 'Elzero' }] },
+                'React': { title: 'كل ما تريد معرفته عن React', icon: '⚛️', introduction: 'React هي مكتبة JavaScript لبناء واجهات مستخدم تفاعلية.', usage: 'تستخدم لبناء تطبيقات الويب أحادية الصفحة (SPAs) المعقدة.', roadmap: [{ title: 'فهم JSX والمكونات', content: 'تعلم كيفية كتابة JSX وبناء المكونات.' }, { title: 'الخصائص (Props) والحالة (State)', content: 'تعلم كيفية تمرير البيانات وإدارة الحالة.' }], codeExamples: [{ title: 'مكون بسيط في رياكت', type: 'jsx', code: `function Welcome(props) {\n  return <h1>Hello, {props.name}</h1>;\n}` }], challenge: { id: 'react_basics', title: 'تحدي React', description: 'أنشئ مكونًا يعرض "Hello, World!".', solution: `function HelloWorld() {\n  return <h1>Hello, World!</h1>;\n}` }, youtubeCourses: [{ channel: 'Codevolution', title: 'React JS Course', link: 'https://www.youtube.com/watch?v=QFaFIcGhPoM&list=PLC3y8-rFHvwgg3vaYJgHGnModB54rxOk3', imgText: 'Codevolution' }] },
+                'Angular': { title: 'كل ما تريد معرفته عن Angular', icon: '🅰️', introduction: 'Angular هو إطار عمل (Framework) قوي لبناء تطبيقات ويب معقدة.', usage: 'يستخدم بشكل واسع في بناء تطبيقات الشركات الكبيرة (Enterprise-level).', roadmap: [{ title: 'المكونات (Components)', content: 'تعلم كيفية بناء المكونات، وهي الوحدات الأساسية.' }, { title: 'ربط البيانات (Data Binding)', content: 'فهم الطرق المختلفة لربط البيانات.' }], codeExamples: [{ title: 'مثال بسيط لمكون Angular', type: 'ts', code: `@Component({\n  selector: 'app-root',\n  template: '<h1>مرحباً, {{title}}!</h1>',\n})\nexport class AppComponent {\n  title = 'Angular';\n}` }], challenge: { id: 'angular_basics', title: 'تحدي Angular', description: 'غير قيمة `title` في المكون إلى اسمك.', solution: `export class AppComponent {\n  title = 'Your Name';\n}` }, youtubeCourses: [{ channel: 'Codevolution', title: 'Angular 17 Course', link: 'https://www.youtube.com/watch?v=0eWrpsCLMJQ&list=PLC3y8-rFHvwhBRAgFinJR8KHIrCdTkZcZ', imgText: 'Codevolution' }] },
+                'Node.js': { title: 'كل ما تريد معرفته عن Node.js', icon: '🟩', introduction: 'Node.js هي بيئة تشغيل JavaScript من جانب الخادم.', usage: 'تستخدم لبناء الواجهات الخلفية (Backend) وواجهات برمجة التطبيقات (APIs).', roadmap: [{ title: 'مفاهيم أساسية', content: 'فهم طبيعة Node.js غير المتزامنة.' }, { title: 'Express.js', content: 'إتقان إطار العمل Express.js.' }], codeExamples: [{ title: 'خادم HTTP بسيط', type: 'js', code: `const http = require('http');\n\nhttp.createServer((req, res) => {\n  res.end('Hello World\\n');\n}).listen(3000);` }], challenge: { id: 'node_basics', title: 'تحدي Node.js', description: 'أنشئ خادم Express بسيط يستجيب بـ "Hello from Express!".', solution: `const express = require('express');\nconst app = express();\n\napp.get('/', (req, res) => {\n  res.send('Hello from Express!');\n});\n\napp.listen(3000);` }, youtubeCourses: [{ channel: 'freeCodeCamp.org', title: 'Node.js Course', link: 'https://www.youtube.com/watch?v=Oe421EPjeBE', imgText: 'freeCodeCamp' }] },
+                'PHP': { title: 'كل ما تريد معرفته عن PHP', icon: '🐘', introduction: 'PHP هي لغة برمجة نصية شائعة من جانب الخادم.', usage: 'تعتبر PHP العمود الفقري للعديد من أنظمة إدارة المحتوى مثل WordPress.', roadmap: [{ title: 'الأساسيات', content: 'تعلم المتغيرات، أنواع البيانات، والشروط.' }, { title: 'التعامل مع النماذج (Forms)', content: 'فهم $_GET و $_POST.' }], codeExamples: [{ title: 'طباعة رسالة', type: 'php', code: `<?php\n  echo "Hello, PHP!";\n?>` }], challenge: { id: 'php_basics', title: 'تحدي PHP', description: 'اكتب كود PHP يعرض التاريخ الحالي.', solution: `<?php\n  echo date('Y-m-d');\n?>` }, youtubeCourses: [{ channel: 'Elzero Web School', title: 'PHP Course', link: 'https://www.youtube.com/watch?v=xcg9qq6SZ0w&list=PLDoPjvoNmBAy41u35AqJUrI-H83DObUDq', imgText: 'Elzero' }] },
+                'C#': { title: 'كل ما تريد معرفته عن C#', icon: '💠', introduction: 'C# هي لغة برمجة حديثة، كائنية التوجه طورتها Microsoft.', usage: 'تستخدم C# لبناء تطبيقات Windows، وتطوير الويب باستخدام ASP.NET، وتطوير الألعاب بـ Unity.', roadmap: [{ title: 'الأساسيات', content: 'تعلم بناء الجملة، المتغيرات، وأنواع البيانات.' }, { title: 'البرمجة كائنية التوجه (OOP)', content: 'فهم مفاهيم OOP مثل الأصناف والكائنات.' }], codeExamples: [{ title: 'برنامج "Hello World"', type: 'csharp', code: `Console.WriteLine("Hello, World!");` }], challenge: { id: 'csharp_basics', title: 'تحدي C#', description: 'اكتب برنامجًا يقرأ اسم المستخدم ويرحب به.', solution: `Console.WriteLine("What is your name?");\nstring name = Console.ReadLine();\nConsole.WriteLine($"Hello, {name}!");` }, youtubeCourses: [{ channel: 'FreeCodeCamp.org', title: 'C# Full Course', link: 'https://www.youtube.com/watch?v=YrtFtdTTfv0', imgText: 'FreeCodeCamp' }] },
+            };
+            
+            const projectsData = [
+                {
+                    id: 'todo-list',
+                    title: 'قائمة المهام التفاعلية',
+                    description: 'مشروع بسيط لبناء قائمة مهام باستخدام HTML, CSS, و JavaScript. ستتعلم كيفية التعامل مع مدخلات المستخدم وتعديل الصفحة ديناميكيًا.',
+                    difficulty: 'سهل',
+                    steps: [
+                        { title: 'الخطوة 1: بناء هيكل HTML', content: 'أنشئ ملف HTML يحتوي على حقل إدخال (input) لإضافة مهمة جديدة، زر (button)، وقائمة غير مرتبة (ul) لعرض المهام.'},
+                        { title: 'الخطوة 2: إضافة التنسيقات بـ CSS', content: 'استخدم CSS لجعل القائمة تبدو أجمل. يمكنك إضافة بعض التنسيقات لحقل الإدخال، الزر، وكل عنصر في القائمة.'},
+                        { title: 'الخطوة 3: إضافة التفاعلية بـ JavaScript', content: 'اكتب كود JavaScript للاستماع إلى حدث النقر على الزر. عند النقر، يجب أن يأخذ النص من حقل الإدخال، ينشئ عنصر قائمة جديد (li)، ويضيفه إلى القائمة (ul).'},
+                        { title: 'الخطوة 4 (تحدي إضافي): حذف المهام', content: 'أضف زر حذف بجانب كل مهمة. عند النقر عليه، يجب أن يتم حذف المهمة من القائمة.'}
+                    ]
+                },
+                {
+                    id: 'weather-app',
+                    title: 'تطبيق الطقس البسيط',
+                    description: 'مشروع لتعلم كيفية جلب البيانات من واجهة برمجة تطبيقات (API) خارجية وعرضها على صفحتك.',
+                    difficulty: 'متوسط',
+                    steps: [
+                        { title: 'الخطوة 1: هيكل HTML', content: 'أنشئ صفحة HTML بسيطة تحتوي على مكان لعرض اسم المدينة، درجة الحرارة، ووصف الطقس.'},
+                        { title: 'الخطوة 2: الحصول على مفتاح API', content: 'اذهب إلى موقع مثل OpenWeatherMap وقم بالتسجيل للحصول على مفتاح API مجاني.'},
+                        { title: 'الخطوة 3: جلب البيانات بـ JavaScript', content: 'استخدم دالة `fetch` في JavaScript لعمل طلب إلى API الطقس، مع إرسال اسم المدينة ومفتاح API الخاص بك.'},
+                        { title: 'الخطوة 4: عرض البيانات', content: 'بمجرد استلام البيانات من الـ API، قم بتحديث عناصر HTML لعرض معلومات الطقس التي حصلت عليها.'}
+                    ]
+                }
+            ];
+
+            let learningPathData = {
+                web: {
+                    id: 'web',
+                    title: '🚀 مسار مطور الويب',
+                    description: 'ابدأ رحلتك في عالم تطوير الويب من الأساسيات إلى بناء المشاريع.',
+                    badgeId: 'web_developer_badge',
+                    steps: [
+                        { id: 'html_basics', title: 'أساسيات HTML', icon: '📘', lessonId: 'HTML', completed: false },
+                        { id: 'css_basics', title: 'مقدمة إلى CSS', icon: '🎨', lessonId: 'CSS', completed: false },
+                        { id: 'js_basics', title: 'أساسيات JavaScript', icon: '⚡', lessonId: 'JavaScript', completed: false },
+                        { id: 'react_basics', title: 'مكتبة React', icon: '⚛️', lessonId: 'React', completed: false },
+                    ]
+                },
+                english: {
+                    id: 'english',
+                    title: '🌍 مسار إتقان الإنجليزية',
+                    description: 'طور مهاراتك في اللغة الإنجليزية من خلال القواعد والمفردات والمحادثات.',
+                    badgeId: 'english_master_badge',
+                    steps: [
+                        { id: 'pronouns', title: 'قواعد: الضمائر', icon: '📘', lessonId: '1. الضمائر (Pronouns)', completed: false },
+                        { id: 'verbs', title: 'قواعد: الأفعال', icon: '📘', lessonId: '2. الأفعال (Verbs)', completed: false },
+                        { id: 'nouns', title: 'قواعد: الأسماء', icon: '📘', lessonId: '3. الأسماء (Nouns)', completed: false },
+                        { id: 'adjectives', title: 'قواعد: الصفات', icon: '📘', lessonId: '4. الصفات (Adjectives)', completed: false },
+                        { id: 'tenses', title: 'قواعد: الأزمنة', icon: '📘', lessonId: '5. الأزمنة (Tenses)', completed: false },
+                        { id: 'l1', title: 'استماع: الطقس', icon: '🎧', lessonId: 'l1', completed: false },
+                        { id: 'l2', title: 'استماع: المكتبة', icon: '🎧', lessonId: 'l2', completed: false },
+                        { id: 'idioms1', title: 'مصطلحات: حظ سعيد', icon: '💡', lessonId: 'idioms1', completed: false }
+                    ]
+                }
+            };
+            
+            const englishGrammarContentNew = {
+                '1. الضمائر (Pronouns)': {
+                    description: `
+                        <p class="mb-4">الضمائر هي كلمات تحل محل الأسماء لتجنب التكرار.</p>
+                        <h4 class="font-semibold text-lg mb-2 text-teal-300">أنواع الضمائر الرئيسية:</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-800 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" class="py-3 px-6">النوع</th>
+                                        <th scope="col" class="py-3 px-6 text-left">Type</th>
+                                        <th scope="col" class="py-3 px-6 text-left">أمثلة (Examples)</th>
+                                        <th scope="col" class="py-3 px-6">الترجمة</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">ضمائر الفاعل</th>
+                                        <td class="py-4 px-6 text-left">Subject Pronouns</td>
+                                        <td class="py-4 px-6 text-left">I, you, he, she, it, we, they</td>
+                                        <td class="py-4 px-6">أنا، أنت/أنتم، هو، هي، هو/هي (لغير العاقل)، نحن، هم</td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">ضمائر المفعول به</th>
+                                        <td class="py-4 px-6 text-left">Object Pronouns</td>
+                                        <td class="py-4 px-6 text-left">me, you, him, her, it, us, them</td>
+                                        <td class="py-4 px-6">ي/ني، ك، ه، ها، ه (لغير العاقل)، نا، هم</td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">صفات الملكية</th>
+                                        <td class="py-4 px-6 text-left">Possessive Adjectives</td>
+                                        <td class="py-4 px-6 text-left">my, your, his, her, its, our, their</td>
+                                        <td class="py-4 px-6">لي، لك، له، لها، لها (لغير العاقل)، لنا، لهم</td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">ضمائر الملكية</th>
+                                        <td class="py-4 px-6 text-left">Possessive Pronouns</td>
+                                        <td class="py-4 px-6 text-left">mine, yours, his, hers, its, ours, theirs</td>
+                                        <td class="py-4 px-6">ملكي، ملكك، ملكه، ملكها، ملكها (لغير العاقل)، ملكنا، ملكهم</td>
+                                    </tr>
+                                    <tr class="bg-white dark:bg-slate-700/50">
+                                        <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">الضمائر الانعكاسية</th>
+                                        <td class="py-4 px-6 text-left">Reflexive Pronouns</td>
+                                        <td class="py-4 px-6 text-left">myself, yourself, himself, herself, itself, ourselves, themselves</td>
+                                        <td class="py-4 px-6">نفسي، نفسك، نفسه، نفسها، نفسها (لغير العاقل)، أنفسنا، أنفسهم</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <h4 class="font-semibold text-lg mt-6 mb-2 text-teal-300">مثال:</h4>
+                        <ul class="list-disc pr-5 space-y-2">
+                            <li>He loves <strong class="text-teal-400">his</strong> car. <span class="text-gray-400">(هو يحب سيارته)</span></li>
+                            <li>She bought it for <strong class="text-teal-400">herself</strong>. <span class="text-gray-400">(هي اشترتها لنفسها)</span></li>
+                        </ul>
+                    `,
+                    quiz: { id: 'pronouns', q: 'اختر الضمير الصحيح: "Sarah saw ___ at the party."', options: ['he', 'his', 'him', 'I'], answer: 'him' }
+                },
+                 '2. الأفعال (Verbs)': {
+                    description: `
+                        <p class="mb-4">الأفعال هي كلمات تدل على حدث أو حالة، هي قلب الجملة.</p>
+                        <h4 class="font-semibold text-lg mb-2 text-teal-300">أفعال شائعة وتصريفاتها:</h4>
+                        <div class="overflow-x-auto">
+                             <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
+                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-800 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" class="py-3 px-6 text-left">الفعل (Base Form)</th>
+                                        <th scope="col" class="py-3 px-6 text-left">الماضي البسيط (Past Simple)</th>
+                                        <th scope="col" class="py-3 px-6 text-left">اسم المفعول (Past Participle)</th>
+                                        <th scope="col" class="py-3 px-6">المعنى</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Be (is/am/are)</td>
+                                        <td class="py-4 px-6 text-left">was / were</td>
+                                        <td class="py-4 px-6 text-left">been</td>
+                                        <td class="py-4 px-6">يكون</td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Have</td>
+                                        <td class="py-4 px-6 text-left">had</td>
+                                        <td class="py-4 px-6 text-left">had</td>
+                                        <td class="py-4 px-6">يملك</td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Do</td>
+                                        <td class="py-4 px-6 text-left">did</td>
+                                        <td class="py-4 px-6 text-left">done</td>
+                                        <td class="py-4 px-6">يفعل</td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Go</td>
+                                        <td class="py-4 px-6 text-left">went</td>
+                                        <td class="py-4 px-6 text-left">gone</td>
+                                        <td class="py-4 px-6">يذهب</td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">See</td>
+                                        <td class="py-4 px-6 text-left">saw</td>
+                                        <td class="py-4 px-6 text-left">seen</td>
+                                        <td class="py-4 px-6">يرى</td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Eat</td>
+                                        <td class="py-4 px-6 text-left">ate</td>
+                                        <td class="py-4 px-6 text-left">eaten</td>
+                                        <td class="py-4 px-6">يأكل</td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Say</td>
+                                        <td class="py-4 px-6 text-left">said</td>
+                                        <td class="py-4 px-6 text-left">said</td>
+                                        <td class="py-4 px-6">يقول</td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Work</td>
+                                        <td class="py-4 px-6 text-left">worked</td>
+                                        <td class="py-4 px-6 text-left">worked</td>
+                                        <td class="py-4 px-6">يعمل</td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Play</td>
+                                        <td class="py-4 px-6 text-left">played</td>
+                                        <td class="py-4 px-6 text-left">played</td>
+                                        <td class="py-4 px-6">يلعب</td>
+                                    </tr>
+                                    <tr class="bg-white dark:bg-slate-700/50">
+                                        <td class="py-4 px-6 text-left">Study</td>
+                                        <td class="py-4 px-6 text-left">studied</td>
+                                        <td class="py-4 px-6 text-left">studied</td>
+                                        <td class="py-4 px-6">يدرس</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <h4 class="font-semibold text-lg mt-6 mb-2 text-teal-300">مثال:</h4>
+                        <ul class="list-disc pr-5 space-y-2">
+                            <li>I <strong class="text-teal-400">eat</strong> breakfast every day. <span class="text-gray-400">(أنا آكل الفطور كل يوم) - مضارع</span></li>
+                            <li>They <strong class="text-teal-400">played</strong> football yesterday. <span class="text-gray-400">(هم لعبوا كرة القدم أمس) - ماضي</span></li>
+                        </ul>
+                    `,
+                    quiz: { id: 'verbs', q: 'ما هو التصريف الماضي لفعل "eat"?', options: ['eaten', 'ate', 'eated', 'eating'], answer: 'ate' }
+                },
+                 '3. الأسماء (Nouns)': {
+                    description: `
+                        <p class="mb-4">الأسماء هي كلمات تشير إلى أشخاص، أماكن، أشياء، أو أفكار.</p>
+                        <h4 class="font-semibold text-lg mb-2 text-teal-300">أنواع الأسماء وأمثلة:</h4>
+                         <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-800 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" class="py-3 px-6">النوع</th>
+                                        <th scope="col" class="py-3 px-6 text-left">أمثلة (Examples)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                   <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6">أشخاص (People)</td>
+                                        <td class="py-4 px-6 text-left">man (رجل), woman (امرأة), teacher (معلم), friend (صديق)</td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6">أماكن (Places)</td>
+                                        <td class="py-4 px-6 text-left">school (مدرسة), house (منزل), city (مدينة), country (دولة)</td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6">أشياء (Things)</td>
+                                        <td class="py-4 px-6 text-left">book (كتاب), phone (هاتف), table (طاولة), car (سيارة)</td>
+                                    </tr>
+                                    <tr class="bg-white dark:bg-slate-700/50">
+                                        <td class="py-4 px-6">أفكار (Ideas)</td>
+                                        <td class="py-4 px-6 text-left">love (حب), happiness (سعادة), freedom (حرية), idea (فكرة)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <h4 class="font-semibold text-lg mt-6 mb-2 text-teal-300">مفرد وجمع (Singular & Plural):</h4>
+                         <ul class="list-disc pr-5 space-y-2">
+                            <li>One book -> Two <strong class="text-teal-400">books</strong> <span class="text-gray-400">(بإضافة s)</span></li>
+                            <li>One box -> Two <strong class="text-teal-400">boxes</strong> <span class="text-gray-400">(بإضافة es)</span></li>
+                            <li>One man -> Two <strong class="text-teal-400">men</strong> <span class="text-gray-400">(جمع شاذ)</span></li>
+                        </ul>
+                    `,
+                    quiz: { id: 'nouns', q: 'أي من الكلمات التالية هو اسم؟', options: ['beautiful', 'quickly', 'happiness', 'is'], answer: 'happiness' }
+                },
+                 '4. الصفات (Adjectives)': {
+                    description: `
+                        <p class="mb-4">الصفات هي كلمات تصف الأسماء أو الضمائر وتعطي عنها معلومات أكثر.</p>
+                        <h4 class="font-semibold text-lg mb-2 text-teal-300">صفات شائعة:</h4>
+                         <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
+                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-800 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" class="py-3 px-6 text-left">الصفة (Adjective)</th>
+                                        <th scope="col" class="py-3 px-6">المعنى</th>
+                                        <th scope="col" class="py-3 px-6 text-left">مثال (Example)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Good</td>
+                                        <td class="py-4 px-6">جيد</td>
+                                        <td class="py-4 px-6 text-left">It is a good book. <span class="text-gray-400">(إنه كتاب جيد)</span></td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Bad</td>
+                                        <td class="py-4 px-6">سيء</td>
+                                        <td class="py-4 px-6 text-left">That was a bad idea. <span class="text-gray-400">(تلك كانت فكرة سيئة)</span></td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Big</td>
+                                        <td class="py-4 px-6">كبير</td>
+                                        <td class="py-4 px-6 text-left">I live in a big city. <span class="text-gray-400">(أنا أعيش في مدينة كبيرة)</span></td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Small</td>
+                                        <td class="py-4 px-6">صغير</td>
+                                        <td class="py-4 px-6 text-left">She has a small cat. <span class="text-gray-400">(لديها قطة صغيرة)</span></td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Happy</td>
+                                        <td class="py-4 px-6">سعيد</td>
+                                        <td class="py-4 px-6 text-left">The children are happy. <span class="text-gray-400">(الأطفال سعداء)</span></td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Sad</td>
+                                        <td class="py-4 px-6">حزين</td>
+                                        <td class="py-4 px-6 text-left">The movie was sad. <span class="text-gray-400">(الفيلم كان حزيناً)</span></td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Beautiful</td>
+                                        <td class="py-4 px-6">جميل</td>
+                                        <td class="py-4 px-6 text-left">What a beautiful flower! <span class="text-gray-400">(يا لها من زهرة جميلة!)</span></td>
+                                    </tr>
+                                    <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">New</td>
+                                        <td class="py-4 px-6">جديد</td>
+                                        <td class="py-4 px-6 text-left">He bought a new car. <span class="text-gray-400">(هو اشترى سيارة جديدة)</span></td>
+                                    </tr>
+                                     <tr class="bg-white border-b dark:bg-slate-700/50 dark:border-gray-700">
+                                        <td class="py-4 px-6 text-left">Old</td>
+                                        <td class="py-4 px-6">قديم / كبير في السن</td>
+                                        <td class="py-4 px-6 text-left">My grandfather is old. <span class="text-gray-400">(جدي كبير في السن)</span></td>
+                                    </tr>
+                                    <tr class="bg-white dark:bg-slate-700/50">
+                                        <td class="py-4 px-6 text-left">Important</td>
+                                        <td class="py-4 px-6">مهم</td>
+                                        <td class="py-4 px-6 text-left">This is an important lesson. <span class="text-gray-400">(هذا درس مهم)</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <h4 class="font-semibold text-lg mt-6 mb-2 text-teal-300">ملاحظة:</h4>
+                        <p>الصفة في الإنجليزية تأتي عادةً قبل الاسم الذي تصفه.</p>
+                        <p class="mt-2">مثال: A <strong class="text-teal-400">red</strong> car (سيارة حمراء) - الصفة "red" جاءت قبل الاسم "car".</p>
+                    `,
+                    quiz: { id: 'adjectives', q: 'اختر الصفة في الجملة: "He drives a fast car."', options: ['He', 'drives', 'fast', 'car'], answer: 'fast' }
+                },
+                 '5. الأزمنة (Tenses)': {
+                    description: 'الأزمنة تحدد وقت وقوع الفعل.',
+                    quiz: { id: 'tenses', q: 'اختر الزمن الصحيح: "She ___ to school every day."', options: ['goes', 'went', 'is going', 'gone'], answer: 'goes' }
+                },
+            };
+
+            const englishGeneralContent = {
+                'أسماء شائعة (Common Nouns)': [
+                    { en: 'Man', ar: 'رجل' }, { en: 'Woman', ar: 'امرأة' }, { en: 'Time', ar: 'وقت' }, { en: 'Year', ar: 'سنة' },
+                    { en: 'Day', ar: 'يوم' }, { en: 'Thing', ar: 'شيء' }, { en: 'World', ar: 'عالم' }, { en: 'Life', ar: 'حياة' },
+                    { en: 'Hand', ar: 'يد' }, { en: 'Part', ar: 'جزء' }, { en: 'Child', ar: 'طفل' }, { en: 'Eye', ar: 'عين' },
+                    { en: 'Place', ar: 'مكان' }, { en: 'Work', ar: 'عمل' }, { en: 'Week', ar: 'أسبوع' }, { en: 'Case', ar: 'حالة' },
+                    { en: 'Point', ar: 'نقطة' }, { en: 'Company', ar: 'شركة' }, { en: 'Number', ar: 'رقم' }, { en: 'Book', ar: 'كتاب' },
+                    { en: 'Car', ar: 'سيارة' }, { en: 'House', ar: 'منزل' }, { en: 'School', ar: 'مدرسة' }, { en: 'City', ar: 'مدينة' }
+                ],
+                'أفعال شائعة (Common Verbs)': [
+                    { en: 'Be', ar: 'يكون' }, { en: 'Have', ar: 'يملك' }, { en: 'Do', ar: 'يفعل' }, { en: 'Say', ar: 'يقول' },
+                    { en: 'Go', ar: 'يذهب' }, { en: 'Get', ar: 'يحصل' }, { en: 'Make', ar: 'يصنع' }, { en: 'Know', ar: 'يعرف' },
+                    { en: 'Think', ar: 'يفكر' }, { en: 'See', ar: 'يرى' }, { en: 'Come', ar: 'يأتي' }, { en: 'Want', ar: 'يريد' },
+                    { en: 'Look', ar: 'ينظر' }, { en: 'Use', ar: 'يستخدم' }, { en: 'Find', ar: 'يجد' }, { en: 'Give', ar: 'يعطي' },
+                    { en: 'Tell', ar: 'يخبر' }, { en: 'Work', ar: 'يعمل' }, { en: 'Call', ar: 'ينادي' }, { en: 'Try', ar: 'يحاول' },
+                    { en: 'Ask', ar: 'يسأل' }, { en: 'Need', ar: 'يحتاج' }, { en: 'Feel', ar: 'يشعر' }, { en: 'Become', ar: 'يصبح' }
+                ],
+                'صفات شائعة (Common Adjectives)': [
+                    { en: 'Good', ar: 'جيد' }, { en: 'New', ar: 'جديد' }, { en: 'First', ar: 'أول' }, { en: 'Last', ar: 'أخير' },
+                    { en: 'Long', ar: 'طويل' }, { en: 'Great', ar: 'عظيم' }, { en: 'Little', ar: 'صغير' }, { en: 'Old', ar: 'قديم' },
+                    { en: 'Right', ar: 'صحيح' }, { en: 'Big', ar: 'كبير' }, { en: 'High', ar: 'عالي' }, { en: 'Different', ar: 'مختلف' },
+                    { en: 'Small', ar: 'صغير' }, { en: 'Large', ar: 'واسع' }, { en: 'Young', ar: 'صغير السن' }, { en: 'Important', ar: 'مهم' },
+                    { en: 'Bad', ar: 'سيء' }, { en: 'Same', ar: 'نفسه' }, { en: 'Able', ar: 'قادر' }
+                ],
+                'الأسرة (Family)': [
+                    { en: 'Father', ar: 'أب' }, { en: 'Mother', ar: 'أم' }, { en: 'Son', ar: 'ابن' }, { en: 'Daughter', ar: 'ابنة' },
+                    { en: 'Brother', ar: 'أخ' }, { en: 'Sister', ar: 'أخت' }, { en: 'Grandfather', ar: 'جد' }, { en: 'Grandmother', ar: 'جدة' },
+                    { en: 'Uncle', ar: 'عم/خال' }, { en: 'Aunt', ar: 'عمة/خالة' }, { en: 'Cousin', ar: 'ابن العم/الخال' }, { en: 'Husband', ar: 'زوج' },
+                    { en: 'Wife', ar: 'زوجة' }, { en: 'Parent', ar: 'والد' }, { en: 'Child', ar: 'طفل' }, { en: 'Baby', ar: 'رضيع' }
+                ],
+                'الطعام (Food)': [
+                    { en: 'Bread', ar: 'خبز' }, { en: 'Rice', ar: 'أرز' }, { en: 'Meat', ar: 'لحم' }, { en: 'Chicken', ar: 'دجاج' },
+                    { en: 'Fish', ar: 'سمك' }, { en: 'Egg', ar: 'بيضة' }, { en: 'Cheese', ar: 'جبن' }, { en: 'Milk', ar: 'حليب' },
+                    { en: 'Water', ar: 'ماء' }, { en: 'Juice', ar: 'عصير' }, { en: 'Fruit', ar: 'فاكهة' }, { en: 'Apple', ar: 'تفاح' },
+                    { en: 'Banana', ar: 'موز' }, { en: 'Vegetable', ar: 'خضروات' }, { en: 'Potato', ar: 'بطاطس' }, { en: 'Tomato', ar: 'طماطم' }
+                ],
+                'الأماكن (Places)': [
+                    { en: 'House', ar: 'منزل' }, { en: 'School', ar: 'مدرسة' }, { en: 'Hospital', ar: 'مستشفى' }, { en: 'Restaurant', ar: 'مطعم' },
+                    { en: 'Market', ar: 'سوق' }, { en: 'Shop', ar: 'متجر' }, { en: 'Library', ar: 'مكتبة' }, { en: 'Park', ar: 'حديقة' },
+                    { en: 'Airport', ar: 'مطار' }, { en: 'Station', ar: 'محطة' }, { en: 'City', ar: 'مدينة' }, { en: 'Country', ar: 'بلد' },
+                    { en: 'Office', ar: 'مكتب' }, { en: 'Bank', ar: 'بنك' }, { en: 'Beach', ar: 'شاطئ' }, { en: 'Hotel', ar: 'فندق' }
+                ],
+                'كلمات بحرف A': [
+                    { en: 'About', ar: 'عن' }, { en: 'Above', ar: 'فوق' }, { en: 'Across', ar: 'عبر' }, { en: 'Act', ar: 'يمثل' },
+                    { en: 'Add', ar: 'يضيف' }, { en: 'Afraid', ar: 'خائف' }, { en: 'After', ar: 'بعد' }, { en: 'Again', ar: 'مرة أخرى' },
+                    { en: 'Age', ar: 'عمر' }, { en: 'Ago', ar: 'منذ' }, { en: 'Agree', ar: 'يوافق' }, { en: 'Air', ar: 'هواء' },
+                    { en: 'All', ar: 'كل' }, { en: 'Allow', ar: 'يسمح' }, { en: 'Also', ar: 'أيضاً' }, { en: 'Always', ar: 'دائماً' },
+                    { en: 'Animal', ar: 'حيوان' }, { en: 'Answer', ar: 'إجابة' }, { en: 'Any', ar: 'أي' }, { en: 'Appear', ar: 'يظهر' },
+                    { en: 'Apple', ar: 'تفاحة' }, { en: 'Area', ar: 'منطقة' }, { en: 'Arm', ar: 'ذراع' }, { en: 'Around', ar: 'حول' }, { en: 'Ask', ar: 'يسأل' }
+                ],
+                'كلمات بحرف B': [
+                    { en: 'Baby', ar: 'طفل' }, { en: 'Back', ar: 'خلف' }, { en: 'Bad', ar: 'سيء' }, { en: 'Ball', ar: 'كرة' },
+                    { en: 'Be', ar: 'يكون' }, { en: 'Beautiful', ar: 'جميل' }, { en: 'Bed', ar: 'سرير' }, { en: 'Before', ar: 'قبل' },
+                    { en: 'Begin', ar: 'يبدأ' }, { en: 'Best', ar: 'أفضل' }, { en: 'Big', ar: 'كبير' }, { en: 'Black', ar: 'أسود' },
+                    { en: 'Blue', ar: 'أزرق' }, { en: 'Book', ar: 'كتاب' }, { en: 'Both', ar: 'كلاهما' }, { en: 'Box', ar: 'صندوق' },
+                    { en: 'Boy', ar: 'ولد' }, { en: 'Bread', ar: 'خبز' }, { en: 'Break', ar: 'يكسر' }, { en: 'Bring', ar: 'يحضر' },
+                    { en: 'Brother', ar: 'أخ' }, { en: 'Brown', ar: 'بني' }, { en: 'Build', ar: 'يبني' }, { en: 'But', ar: 'لكن' }, { en: 'By', ar: 'بواسطة' }
+                ],
+                'كلمات بحرف C': [
+                    { en: 'Call', ar: 'ينادي' }, { en: 'Can', ar: 'يستطيع' }, { en: 'Car', ar: 'سيارة' }, { en: 'Care', ar: 'يهتم' },
+                    { en: 'Carry', ar: 'يحمل' }, { en: 'Case', ar: 'حالة' }, { en: 'Cat', ar: 'قطة' }, { en: 'Change', ar: 'يغير' },
+                    { en: 'Child', ar: 'طفل' }, { en: 'City', ar: 'مدينة' }, { en: 'Clean', ar: 'نظيف' }, { en: 'Close', ar: 'يغلق' },
+                    { en: 'Cold', ar: 'بارد' }, { en: 'Come', ar: 'يأتي' }, { en: 'Company', ar: 'شركة' }, { en: 'Correct', ar: 'صحيح' },
+                    { en: 'Country', ar: 'بلد' }, { en: 'Course', ar: 'دورة' }, { en: 'Cover', ar: 'يغطي' }, { en: 'Cry', ar: 'يبكي' }, { en: 'Cut', ar: 'يقطع' }
+                ],
+                 'كلمات بحرف D': [
+                    { en: 'Dark', ar: 'مظلم' }, { en: 'Day', ar: 'يوم' }, { en: 'Decide', ar: 'يقرر' }, { en: 'Deep', ar: 'عميق' },
+                    { en: 'Different', ar: 'مختلف' }, { en: 'Difficult', ar: 'صعب' }, { en: 'Do', ar: 'يفعل' }, { en: 'Doctor', ar: 'طبيب' },
+                    { en: 'Dog', ar: 'كلب' }, { en: 'Door', ar: 'باب' }, { en: 'Down', ar: 'أسفل' }, { en: 'Draw', ar: 'يرسم' },
+                    { en: 'Dream', ar: 'حلم' }, { en: 'Drink', ar: 'يشرب' }, { en: 'Drive', ar: 'يقود' }, { en: 'Dry', ar: 'جاف' }
+                ],
+                'كلمات بحرف E': [
+                    { en: 'Each', ar: 'كل' }, { en: 'Early', ar: 'مبكر' }, { en: 'Earth', ar: 'أرض' }, { en: 'Easy', ar: 'سهل' },
+                    { en: 'Eat', ar: 'يأكل' }, { en: 'Egg', ar: 'بيضة' }, { en: 'End', ar: 'نهاية' }, { en: 'Enjoy', ar: 'يستمتع' },
+                    { en: 'Enough', ar: 'كاف' }, { en: 'Even', ar: 'حتى' }, { en: 'Ever', ar: 'أبدا' }, { en: 'Every', ar: 'كل' }, { en: 'Eye', ar: 'عين' }
+                ],
+                'كلمات بحرف F': [
+                    { en: 'Face', ar: 'وجه' }, { en: 'Fall', ar: 'يسقط' }, { en: 'Family', ar: 'عائلة' }, { en: 'Far', ar: 'بعيد' },
+                    { en: 'Fast', ar: 'سريع' }, { en: 'Father', ar: 'أب' }, { en: 'Feel', ar: 'يشعر' }, { en: 'Few', ar: 'قليل' },
+                    { en: 'Find', ar: 'يجد' }, { en: 'Fine', ar: 'بخير' }, { en: 'Finish', ar: 'ينهي' }, { en: 'Fire', ar: 'نار' },
+                    { en: 'First', ar: 'أول' }, { en: 'Fish', ar: 'سمك' }, { en: 'Five', ar: 'خمسة' }, { en: 'Fly', ar: 'يطير' },
+                    { en: 'Follow', ar: 'يتبع' }, { en: 'Food', ar: 'طعام' }, { en: 'For', ar: 'ل' }, { en: 'Friend', ar: 'صديق' }, { en: 'From', ar: 'من' }
+                ],
+                'كلمات بحرف G': [
+                    { en: 'Game', ar: 'لعبة' }, { en: 'Get', ar: 'يحصل' }, { en: 'Girl', ar: 'فتاة' }, { en: 'Give', ar: 'يعطي' },
+                    { en: 'Go', ar: 'يذهب' }, { en: 'Good', ar: 'جيد' }, { en: 'Great', ar: 'عظيم' }, { en: 'Green', ar: 'أخضر' },
+                    { en: 'Group', ar: 'مجموعة' }, { en: 'Grow', ar: 'ينمو' }
+                ],
+                'كلمات بحرف H': [
+                    { en: 'Hair', ar: 'شعر' }, { en: 'Half', ar: 'نصف' }, { en: 'Hand', ar: 'يد' }, { en: 'Happy', ar: 'سعيد' },
+                    { en: 'Hard', ar: 'صعب' }, { en: 'Have', ar: 'يملك' }, { en: 'He', ar: 'هو' }, { en: 'Head', ar: 'رأس' },
+                    { en: 'Hear', ar: 'يسمع' }, { en: 'Heart', ar: 'قلب' }, { en: 'Help', ar: 'يساعد' }, { en: 'Here', ar: 'هنا' },
+                    { en: 'High', ar: 'عالي' }, { en: 'Hold', ar: 'يمسك' }, { en: 'Home', ar: 'منزل' }, { en: 'Hot', ar: 'حار' },
+                    { en: 'Hour', ar: 'ساعة' }, { en: 'House', ar: 'بيت' }
+                ],
+                'كلمات بحرف I': [
+                    { en: 'I', ar: 'أنا' }, { en: 'Idea', ar: 'فكرة' }, { en: 'If', ar: 'إذا' }, { en: 'Important', ar: 'مهم' },
+                    { en: 'In', ar: 'في' }, { en: 'Into', ar: 'إلى' }, { en: 'Is', ar: 'يكون' }, { en: 'It', ar: 'هو/هي لغير العاقل' }
+                ],
+                'كلمات بحرف J': [
+                    { en: 'Job', ar: 'وظيفة' }, { en: 'Join', ar: 'ينضم' }, { en: 'Jump', ar: 'يقفز' }, { en: 'Just', ar: 'فقط' }
+                ],
+                'كلمات بحرف K': [
+                    { en: 'Keep', ar: 'يحافظ' }, { en: 'Key', ar: 'مفتاح' }, { en: 'Kind', ar: 'نوع/لطيف' }, { en: 'Know', ar: 'يعرف' }
+                ],
+                'كلمات بحرف L': [
+                    { en: 'Land', ar: 'أرض' }, { en: 'Large', ar: 'كبير' }, { en: 'Last', ar: 'أخير' }, { en: 'Laugh', ar: 'يضحك' },
+                    { en: 'Learn', ar: 'يتعلم' }, { en: 'Leave', ar: 'يغادر' }, { en: 'Left', ar: 'يسار' }, { en: 'Let', ar: 'يدع' },
+                    { en: 'Life', ar: 'حياة' }, { en: 'Light', ar: 'ضوء' }, { en: 'Like', ar: 'يحب' }, { en: 'Line', ar: 'خط' },
+                    { en: 'Listen', ar: 'يستمع' }, { en: 'Little', ar: 'صغير' }, { en: 'Live', ar: 'يعيش' }, { en: 'Long', ar: 'طويل' }, { en: 'Look', ar: 'ينظر' }
+                ],
+                'كلمات بحرف M': [
+                    { en: 'Make', ar: 'يصنع' }, { en: 'Man', ar: 'رجل' }, { en: 'Many', ar: 'كثير' }, { en: 'Me', ar: 'أنا (مفعول به)' },
+                    { en: 'Mean', ar: 'يعني' }, { en: 'Meet', ar: 'يقابل' }, { en: 'Milk', ar: 'حليب' }, { en: 'Money', ar: 'مال' },
+                    { en: 'Month', ar: 'شهر' }, { en: 'More', ar: 'أكثر' }, { en: 'Morning', ar: 'صباح' }, { en: 'Mother', ar: 'أم' },
+                    { en: 'Move', ar: 'يتحرك' }, { en: 'Much', ar: 'كثير' }, { en: 'My', ar: 'لي' }
+                ],
+                'كلمات بحرف N': [
+                    { en: 'Name', ar: 'اسم' }, { en: 'Near', ar: 'قريب' }, { en: 'Need', ar: 'يحتاج' }, { en: 'Never', ar: 'أبداً' },
+                    { en: 'New', ar: 'جديد' }, { en: 'Next', ar: 'تالي' }, { en: 'Night', ar: 'ليل' }, { en: 'No', ar: 'لا' },
+                    { en: 'Not', ar: 'ليس' }, { en: 'Now', ar: 'الآن' }, { en: 'Number', ar: 'رقم' }
+                ],
+                'كلمات بحرف O': [
+                    { en: 'Of', ar: 'من' }, { en: 'Off', ar: 'إطفاء/بعيد' }, { en: 'Often', ar: 'غالباً' }, { en: 'Old', ar: 'قديم' },
+                    { en: 'On', ar: 'على' }, { en: 'Once', ar: 'مرة واحدة' }, { en: 'One', ar: 'واحد' }, { en: 'Only', ar: 'فقط' },
+                    { en: 'Open', ar: 'يفتح' }, { en: 'Or', ar: 'أو' }, { en: 'Other', ar: 'آخر' }, { en: 'Our', ar: 'لنا' }, { en: 'Out', ar: 'خارج' }
+                ],
+                'كلمات بحرف P': [
+                    { en: 'Page', ar: 'صفحة' }, { en: 'Paper', ar: 'ورق' }, { en: 'Part', ar: 'جزء' }, { en: 'Pay', ar: 'يدفع' },
+                    { en: 'People', ar: 'ناس' }, { en: 'Place', ar: 'مكان' }, { en: 'Play', ar: 'يلعب' }, { en: 'Point', ar: 'نقطة' },
+                    { en: 'Power', ar: 'قوة' }, { en: 'Problem', ar: 'مشكلة' }, { en: 'Put', ar: 'يضع' }
+                ],
+                'كلمات بحرف Q': [
+                    { en: 'Queen', ar: 'ملكة' }, { en: 'Question', ar: 'سؤال' }, { en: 'Quick', ar: 'سريع' }, { en: 'Quiet', ar: 'هادئ' }
+                ],
+                'كلمات بحرف R': [
+                    { en: 'Rain', ar: 'مطر' }, { en: 'Read', ar: 'يقرأ' }, { en: 'Ready', ar: 'جاهز' }, { en: 'Red', ar: 'أحمر' },
+                    { en: 'Remember', ar: 'يتذكر' }, { en: 'Right', ar: 'يمين/صحيح' }, { en: 'River', ar: 'نهر' }, { en: 'Road', ar: 'طريق' }, { en: 'Room', ar: 'غرفة' }, { en: 'Run', ar: 'يجري' }
+                ],
+                'كلمات بحرف S': [
+                    { en: 'Same', ar: 'نفسه' }, { en: 'Say', ar: 'يقول' }, { en: 'School', ar: 'مدرسة' }, { en: 'Sea', ar: 'بحر' },
+                    { en: 'See', ar: 'يرى' }, { en: 'Sell', ar: 'يبيع' }, { en: 'Send', ar: 'يرسل' }, { en: 'She', ar: 'هي' },
+                    { en: 'Short', ar: 'قصير' }, { en: 'Show', ar: 'يعرض' }, { en: 'Side', ar: 'جانب' }, { en: 'Sing', ar: 'يغني' },
+                    { en: 'Sister', ar: 'أخت' }, { en: 'Sit', ar: 'يجلس' }, { en: 'Small', ar: 'صغير' }, { en: 'So', ar: 'لذلك' },
+                    { en: 'Some', ar: 'بعض' }, { en: 'Son', ar: 'ابن' }, { en: 'Sound', ar: 'صوت' }, { en: 'Speak', ar: 'يتكلم' },
+                    { en: 'Stand', ar: 'يقف' }, { en: 'Start', ar: 'يبدأ' }, { en: 'Stop', ar: 'يتوقف' }, { en: 'Story', ar: 'قصة' },
+                    { en: 'Study', ar: 'يدرس' }, { en: 'Sun', ar: 'شمس' }
+                ],
+                'كلمات بحرف T': [
+                    { en: 'Table', ar: 'طاولة' }, { en: 'Take', ar: 'يأخذ' }, { en: 'Talk', ar: 'يتحدث' }, { en: 'Teach', ar: 'يعلم' },
+                    { en: 'Tell', ar: 'يخبر' }, { en: 'Ten', ar: 'عشرة' }, { en: 'Thank', ar: 'يشكر' }, { en: 'That', ar: 'ذلك' },
+                    { en: 'The', ar: 'ال' }, { en: 'Their', ar: 'لهم' }, { en: 'Them', ar: 'هم' }, { en: 'Then', ar: 'ثم' },
+                    { en: 'There', ar: 'هناك' }, { en: 'These', ar: 'هؤلاء' }, { en: 'They', ar: 'هم' }, { en: 'Thing', ar: 'شيء' },
+                    { en: 'Think', ar: 'يفكر' }, { en: 'This', ar: 'هذا' }, { en: 'Time', ar: 'وقت' }, { en: 'To', ar: 'إلى' },
+                    { en: 'Today', ar: 'اليوم' }, { en: 'Too', ar: 'أيضاً' }, { en: 'Tree', ar: 'شجرة' }, { en: 'Try', ar: 'يحاول' }
+                ],
+                'كلمات بحرف U': [
+                    { en: 'Under', ar: 'تحت' }, { en: 'Understand', ar: 'يفهم' }, { en: 'Until', ar: 'حتى' }, { en: 'Up', ar: 'فوق' }, { en: 'Use', ar: 'يستخدم' }
+                ],
+                'كلمات بحرف V': [
+                    { en: 'Very', ar: 'جداً' }, { en: 'Visit', ar: 'يزور' }, { en: 'Voice', ar: 'صوت' }
+                ],
+                'كلمات بحرف W': [
+                    { en: 'Wait', ar: 'ينتظر' }, { en: 'Walk', ar: 'يمشي' }, { en: 'Wall', ar: 'جدار' }, { en: 'Want', ar: 'يريد' },
+                    { en: 'War', ar: 'حرب' }, { en: 'Warm', ar: 'دافئ' }, { en: 'Watch', ar: 'يشاهد' }, { en: 'Water', ar: 'ماء' },
+                    { en: 'Way', ar: 'طريق' }, { en: 'We', ar: 'نحن' }, { en: 'Wear', ar: 'يلبس' }, { en: 'Week', ar: 'أسبوع' },
+                    { en: 'Well', ar: 'بخير' }, { en: 'What', ar: 'ماذا' }, { en: 'When', ar: 'متى' }, { en: 'Where', ar: 'أين' },
+                    { en: 'White', ar: 'أبيض' }, { en: 'Who', ar: 'من' }, { en: 'Why', ar: 'لماذا' }, { en: 'Will', ar: 'سوف' },
+                    { en: 'With', ar: 'مع' }, { en: 'Woman', ar: 'امرأة' }, { en: 'Word', ar: 'كلمة' }, { en: 'Work', ar: 'يعمل' },
+                    { en: 'World', ar: 'عالم' }, { en: 'Write', ar: 'يكتب' }
+                ],
+                'كلمات بحرف Y': [
+                    { en: 'Year', ar: 'سنة' }, { en: 'Yellow', ar: 'أصفر' }, { en: 'Yes', ar: 'نعم' }, { en: 'Yesterday', ar: 'أمس' },
+                    { en: 'You', ar: 'أنت' }, { en: 'Young', ar: 'صغير' }
+                ],
+                'كلمات بحرف Z': [
+                    { en: 'Zero', ar: 'صفر' }, { en: 'Zoo', ar: 'حديقة حيوان' }
+                ]
+            };
+            
+             const careerPrepContent = {
+                'التحضير للمقابلات الفنية': {
+                    description: 'استعد لمقابلتك الفنية القادمة من خلال فهم أنواع الأسئلة الشائعة وكيفية الإجابة عليها بثقة.',
+                    topics: [
+                        { 
+                            title: 'أسئلة الخوارزميات وهياكل البيانات',
+                            content: '<p>هذا هو الجزء الأكثر شيوعًا. توقع أسئلة حول المصفوفات، السلاسل النصية، القوائم المترابطة، الأشجار، والرسوم البيانية. تدرب على حل المشكلات على منصات مثل LeetCode.</p><p><strong>مثال:</strong> "اكتب دالة لعكس سلسلة نصية."</p>'
+                        },
+                        { 
+                            title: 'أسئلة تصميم الأنظمة (System Design)',
+                            content: '<p>تُطرح هذه الأسئلة عادةً للمناصب المتقدمة. الهدف هو تقييم قدرتك على تصميم أنظمة قابلة للتطوير. مثال: "كيف تصمم خدمة مثل تويتر؟"</p>'
+                        },
+                        { 
+                            title: 'الأسئلة السلوكية (Behavioral Questions)',
+                            content: '<p>تهدف إلى تقييم مهاراتك الشخصية وكيفية تعاملك مع المواقف المختلفة في بيئة العمل. استعد بأمثلة من تجاربك السابقة باستخدام طريقة STAR (Situation, Task, Action, Result).</p><p><strong>مثال:</strong> "أخبرني عن تحدٍ واجهته في مشروع سابق وكيف تعاملت معه."</p>'
+                        }
+                    ]
+                },
+                'دليل العمل الحر (Freelancing)': {
+                    description: 'ابدأ رحلتك في العمل الحر. إليك بعض النصائح الأساسية للنجاح.',
+                     topics: [
+                        { 
+                            title: 'بناء معرض أعمال (Portfolio) قوي',
+                            content: '<p>معرض أعمالك هو بطاقتك التعريفية. يجب أن يحتوي على أفضل مشاريعك، مع شرح واضح للمشكلة التي حلها المشروع والتقنيات التي استخدمتها. يمكنك استخدام GitHub Pages أو Netlify لبناء موقع بسيط مجانًا.</p>'
+                        },
+                        { 
+                            title: 'العثور على العملاء',
+                            content: '<p>ابدأ بمنصات العمل الحر الشهيرة مثل Upwork أو Freelancer.com. لاحقًا، يمكنك الاعتماد على شبكة علاقاتك والتسويق الشخصي على منصات مثل LinkedIn.</p>'
+                        },
+                        { 
+                            title: 'تسعير خدماتك',
+                            content: '<p>ابحث عن متوسط أسعار الخدمات التي تقدمها في منطقتك. يمكنك البدء بسعر ساعة منخفض قليلاً لبناء سمعتك، ثم زيادة أسعارك تدريجيًا مع اكتساب المزيد من الخبرة والتقييمات الإيجابية.</p>'
+                        }
+                    ]
+                }
+            };
+            
+            const idiomsData = [
+                { idiom: 'Break a leg', meaning: 'يستخدم لتمني الحظ السعيد', example: 'You have a presentation today? Break a leg!' },
+                { idiom: 'Piece of cake', meaning: 'لوصف شيء سهل جداً', example: 'The exam was a piece of cake.' },
+            ];
+            
+            const listeningExercises = [
+                { id: 'l1', title: 'الطقس اليوم', audioText: 'The weather is sunny and warm today.', question: 'كيف هو الطقس اليوم؟', options: ['بارد وممطر', 'مشمس ودافئ', 'غائم وعاصف'], answer: 'مشمس ودافئ' },
+                { id: 'l2', title: 'في', audioText: 'I am going to the library to borrow some books.', question: 'إلى أين يذهب المتحدث؟', options: ['الحديقة', 'السوق', 'المكتبة'], answer: 'المكتبة' }
+            ];
+
+            // This function creates a card for a given technology
+            const createCard = (techName) => {
+                const svgIcon = techSVGs[techName] || `<span class="text-xl font-bold">${techName.substring(0, 2)}</span>`;
+                return `<div class="card rounded-xl p-4 text-center cursor-pointer group" data-tech="${techName}"><div class="bg-slate-900 text-gray-300 group-hover:text-white transition-colors duration-300 rounded-lg w-16 h-16 mx-auto mb-3 flex items-center justify-center pointer-events-none">${svgIcon}</div><h3 class="font-semibold pointer-events-none">${techName}</h3></div>`;
+            };
+
+            const generateEnglishGrammarPage = () => {
+                const accordionsContainer = document.getElementById('english-grammar-accordions');
+                if (!accordionsContainer) return;
+
+                const quizzes = []; // Array to hold quizzes
+                
+                let accordionsHTML = Object.entries(englishGrammarContentNew).map(([title, data]) => {
+                    if (data.quiz) {
+                        const quizContainer = `
+                            <div class="mt-6 p-4 border-t border-teal-500/30 quiz-container" data-lesson-id="${data.quiz.id}">
+                                <h4 class="font-semibold mb-3 text-teal-300">اختبر نفسك:</h4>
+                                <p class="mb-3">${data.quiz.q}</p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    ${data.quiz.options.map(opt => `<div class="quiz-option" data-correct="${opt === data.quiz.answer}">${opt}</div>`).join('')}
+                                </div>
+                                <div class="quiz-feedback mt-3"></div>
+                            </div>
+                        `;
+                        quizzes.push(quizContainer);
+                    }
+                    
+                    return `
+                        <div>
+                            <button class="accordion-header"><span>${title}</span><span class="arrow">▼</span></button>
+                            <div class="accordion-content">
+                                <div class="p-4">
+                                    ${data.description}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Add quizzes at the end in a separate card
+                const quizzesHTML = `
+                    <div class="info-card mt-6">
+                        <h3 class="text-xl mb-4">🧠 اختبارات سريعة</h3>
+                        <div class="space-y-4">
+                            ${quizzes.join('')}
+                        </div>
+                    </div>
+                `;
+
+                accordionsContainer.innerHTML = accordionsHTML + quizzesHTML;
+
+                setupAccordionListeners(accordionsContainer);
+                setupQuizListeners(accordionsContainer);
+            };
+
+            const generateEnglishGeneralPage = () => {
+                const accordionsContainer = document.getElementById('english-general-accordions');
+                 if (!accordionsContainer) return;
+                accordionsContainer.innerHTML = Object.entries(englishGeneralContent).map(([category, words]) => `
+                    <div>
+                        <button class="accordion-header"><span>${category}</span><span class="arrow">▼</span></button>
+                        <div class="accordion-content">
+                            <div class="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                ${words.map(word => `
+                                    <div class="p-2 bg-slate-700/50 rounded-md flex justify-between items-center">
+                                        <span class="capitalize">${word.en} <span class="text-gray-400 text-sm">(${word.ar})</span></span>
+                                        <button class="speak-btn" data-text="${word.en}">🔊</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                setupAccordionListeners(accordionsContainer);
+                setupTextToSpeech(accordionsContainer);
+            };
+            
+            const generateIdiomsPage = () => {
+                const container = document.getElementById('idioms-content');
+                 if (!container) return;
+
+                const newIdiomsData = [...idiomsData,
+                    { idiom: 'Bite the bullet', meaning: 'مواجهة موقف صعب بشجاعة', example: 'She had to bite the bullet and tell him the truth.' },
+                    { idiom: 'Get cold feet', meaning: 'الشعور بالتردد أو الخوف قبل القيام بشيء', example: 'He was going to ask her out, but he got cold feet.' }
+                ];
+
+                let idiomsHTML = newIdiomsData.map(item => `
+                    <div>
+                        <button class="accordion-header">
+                            <span>${item.idiom}</span><span class="arrow">▼</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4">
+                                <p class="font-semibold mb-2">المعنى: ${item.meaning}</p>
+                                <p><strong>مثال:</strong> "${item.example}"</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                const quizHTML = `
+                    <div class="info-card mt-6">
+                        <h3 class="text-xl mb-4">🧠 اختبارات سريعة</h3>
+                        <div class="space-y-4">
+                            <div class="quiz-container" data-lesson-id="idioms1">
+                                <h4 class="font-semibold mb-3 text-teal-300">اختر المصطلح الصحيح:</h4>
+                                <p class="mb-3">When you tell someone to 'break a leg', you are wishing them...</p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="quiz-option" data-correct="false">good health</div>
+                                    <div class="quiz-option" data-correct="true">good luck</div>
+                                    <div class="quiz-option" data-correct="false">a broken bone</div>
+                                    <div class="quiz-option" data-correct="false">a long journey</div>
+                                </div>
+                                <div class="quiz-feedback mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                container.innerHTML = idiomsHTML + quizHTML;
+                
+                setupAccordionListeners(container);
+                setupQuizListeners(container);
+            };
+
+            const generateProjectsPage = () => {
+                const container = document.getElementById('projects-list');
+                if (!container) return;
+                container.innerHTML = projectsData.map(project => `
+                    <div class="info-card">
+                         <h3 class="text-xl mb-1">${project.title}</h3>
+                         <p class="text-sm text-teal-300 mb-4">الصعوبة: ${project.difficulty}</p>
+                         <p class="mb-4">${project.description}</p>
+                         <div>
+                            <button class="accordion-header"><span>عرض خطوات المشروع</span><span class="arrow">▼</span></button>
+                            <div class="accordion-content">
+                                <div class="p-4 space-y-4">
+                                ${project.steps.map((step, index) => `
+                                    <div>
+                                        <h4 class="font-bold text-teal-400">${step.title}</h4>
+                                        <p>${step.content}</p>
+                                    </div>
+                                `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                setupAccordionListeners(container);
+            };
+            
+            const generateCareerPrepPage = () => {
+                const container = document.getElementById('career-prep-content');
+                if (!container) return;
+
+                let contentHTML = Object.entries(careerPrepContent).map(([sectionTitle, data]) => {
+                    const topicsHTML = data.topics.map(topic => `
+                        <div>
+                            <button class="accordion-header"><span>${topic.title}</span><span class="arrow">▼</span></button>
+                            <div class="accordion-content">
+                                <div class="p-4 space-y-2">
+                                   ${topic.content}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    return `
+                        <div class="info-card">
+                            <h3 class="text-2xl mb-4">${sectionTitle}</h3>
+                            <p class="mb-4 text-gray-400">${data.description}</p>
+                            <div class="space-y-2">${topicsHTML}</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                container.innerHTML = contentHTML;
+                setupAccordionListeners(container);
+            };
+
+            const generateListeningPage = () => {
+                const container = document.getElementById('listening-exercises');
+                if (!container) return;
+                container.innerHTML = listeningExercises.map(ex => `
+                    <div class="info-card quiz-container" data-lesson-id="${ex.id}">
+                        <h3 class="text-xl mb-4">${ex.title}</h3>
+                        <div class="mb-4">
+                            <button class="speak-btn text-4xl" data-text="${ex.audioText}">▶️</button>
+                            <span class="text-gray-400">استمع إلى المقطع الصوتي</span>
+                        </div>
+                        <div class="mt-6 p-4 border-t border-teal-500/30">
+                            <h4 class="font-semibold mb-3 text-teal-300">اختر الإجابة الصحيحة:</h4>
+                            <p class="mb-3">${ex.question}</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                ${ex.options.map(opt => `<div class="quiz-option" data-correct="${opt === ex.answer}">${opt}</div>`).join('')}
+                            </div>
+                            <div class="quiz-feedback mt-3"></div>
+                        </div>
+                    </div>
+                `).join('');
+                setupTextToSpeech(container);
+                setupQuizListeners(container);
+            };
+            
+            const setupAccordionListeners = (parent) => {
+                parent.querySelectorAll('.accordion-header').forEach(header => {
+                    header.addEventListener('click', () => {
+                        const content = header.nextElementSibling;
+                        header.classList.toggle('active');
+                        if (header.classList.contains('active')) {
+                            content.style.maxHeight = content.scrollHeight + "px";
+                            content.style.paddingTop = "1rem";
+                            content.style.paddingBottom = "1rem";
+                        } else {
+                            content.style.maxHeight = null;
+                            content.style.paddingTop = "0";
+                            content.style.paddingBottom = "0";
+                        }
+                    });
+                });
+            };
+            
+            const setupQuizListeners = (parent) => {
+                parent.querySelectorAll('.quiz-container').forEach(quiz => {
+                    const lessonId = quiz.dataset.lessonId;
+                    const isCompleted = isLessonCompleted(lessonId);
+                    const options = quiz.querySelectorAll('.quiz-option');
+
+                    if (isCompleted) {
+                        options.forEach(opt => {
+                            if (opt.dataset.correct === 'true') opt.classList.add('correct');
+                            opt.style.pointerEvents = 'none';
+                        });
+                        return;
+                    }
+
+                    options.forEach(option => {
+                        option.addEventListener('click', () => {
+                           const feedback = quiz.querySelector('.quiz-feedback');
+                            quiz.querySelectorAll('.quiz-option').forEach(opt => opt.style.pointerEvents = 'none');
+                            
+                            if (option.dataset.correct === 'true') {
+                                option.classList.add('correct');
+                                feedback.textContent = 'إجابة صحيحة! تم إضافة 3 نقاط خبرة.';
+                                feedback.className = 'quiz-feedback p-2 rounded-md bg-green-500/20 text-green-400';
+                                markLessonAsComplete(lessonId);
+                            } else {
+                                option.classList.add('incorrect');
+                                const correctOption = quiz.querySelector('.quiz-option[data-correct="true"]');
+                                if (correctOption) {
+                                    correctOption.classList.add('correct');
+                                    feedback.textContent = `إجابة خاطئة. الإجابة الصحيحة هي: "${correctOption.textContent}"`;
+                                } else {
+                                    feedback.textContent = 'إجابة خاطئة، حاول مرة أخرى.';
+                                }
+                                feedback.className = 'quiz-feedback p-2 rounded-md bg-red-500/20 text-red-400';
+                            }
+                        });
+                    });
+                });
+            };
+
+            const isLessonCompleted = (lessonId) => {
+                for (const pathKey in learningPathData) {
+                    const step = learningPathData[pathKey].steps.find(s => s.id === lessonId);
+                    if (step) return step.completed;
+                }
+                return false;
+            }
+
+            const markLessonAsComplete = (lessonId) => {
+                 for (const pathKey in learningPathData) {
+                    const path = learningPathData[pathKey];
+                    const step = path.steps.find(s => s.id === lessonId);
+                    if (step && !step.completed) {
+                        step.completed = true;
+                        // localStorage.setItem('learningPathData', JSON.stringify(learningPathData)); // Removed saving
+                        renderSkillTree();
+                        break;
+                    }
+                }
+            };
+
+            const setupTextToSpeech = (parent) => {
+                parent.querySelectorAll('.speak-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const textToSpeak = e.target.dataset.text;
+                        if (textToSpeak && 'speechSynthesis' in window) {
+                            window.speechSynthesis.cancel();
+                            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                            utterance.lang = 'en-US';
+                            window.speechSynthesis.speak(utterance);
+                        }
+                    });
+                });
+            };
+            
+            const switchView = (viewId) => {
+                 if (viewId === 'learning-path-view') renderSkillTree();
+                 
+                 views.forEach(view => {
+                    view.id === viewId ? view.classList.remove('hidden') : view.classList.add('hidden');
+                });
+                navLinks.forEach(l => {
+                    const linkView = l.dataset.view;
+                    const englishViews = ['english-general-view', 'listening-view', 'idioms-view', 'flashcards-view'];
+                    if (englishViews.includes(viewId)) {
+                        linkView === 'english-general-view' ? l.classList.add('active') : l.classList.remove('active');
+                    } else {
+                        linkView === viewId ? l.classList.add('active') : l.classList.remove('active');
+                    }
+                });
+                 window.scrollTo(0, 0);
+            };
+            
+             // --- Code Playground Logic ---
+            const htmlEditor = document.getElementById('html-editor');
+            const cssEditor = document.getElementById('css-editor');
+            const jsEditor = document.getElementById('js-editor');
+            const outputFrame = document.getElementById('playground-output-iframe');
+            const runCodeBtn = document.getElementById('run-code');
+
+            const updatePlayground = () => {
+                if(!htmlEditor) return;
+                const htmlCode = htmlEditor.value;
+                const cssCode = `<style>${cssEditor.value}<\/style>`;
+                const jsCode = `<script>${jsEditor.value}<\/script>`;
+                const combinedCode = `<html><head>${cssCode}</head><body>${htmlCode}${jsCode}</body></html>`;
+                outputFrame.srcdoc = combinedCode;
+            }
+
+            if (runCodeBtn) {
+                 runCodeBtn.addEventListener('click', updatePlayground);
+            }
+            
+            function openPlayground(button) {
+                const codeType = button.dataset.codeType;
+                const code = decodeURIComponent(button.dataset.code);
+                
+                htmlEditor.value = '';
+                cssEditor.value = '';
+                jsEditor.value = '';
+
+                if (codeType === 'html') {
+                    htmlEditor.value = code;
+                } else if (codeType === 'css') {
+                    cssEditor.value = code;
+                } else if (codeType === 'js' || codeType === 'jsx' || codeType === 'ts') { // Handle JS-like types
+                    jsEditor.value = code;
+                }
+                updatePlayground();
+                switchView('playground-view');
+            }
+
+            // --- Flashcard Logic ---
+            const flashcard = document.getElementById('flashcard');
+            const flashcardFront = document.getElementById('flashcard-front');
+            const flashcardBack = document.getElementById('flashcard-back');
+            const nextFlashcardBtn = document.getElementById('next-flashcard');
+            const categorySelect = document.getElementById('flashcard-category');
+            let currentFlashcards = [];
+            let currentCardIndex = 0;
+
+            function setupFlashcards() {
+                if(!categorySelect) return;
+
+                // Populate categories
+                Object.keys(englishGeneralContent).forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    categorySelect.appendChild(option);
+                });
+
+                loadFlashcards(categorySelect.value);
+
+                categorySelect.addEventListener('change', (e) => {
+                    loadFlashcards(e.target.value);
+                });
+
+                if (flashcard) {
+                    flashcard.addEventListener('click', () => {
+                        flashcard.classList.toggle('is-flipped');
+                    });
+                }
+                
+                if (nextFlashcardBtn) {
+                    nextFlashcardBtn.addEventListener('click', showNextFlashcard);
+                }
+            }
+
+            function loadFlashcards(category) {
+                currentFlashcards = [...englishGeneralContent[category]].sort(() => Math.random() - 0.5);
+                currentCardIndex = 0;
+                showNextFlashcard();
+            }
+
+            function showNextFlashcard() {
+                if (!flashcardFront || !flashcardBack) return;
+
+                if (currentFlashcards.length === 0) {
+                    flashcardFront.textContent = 'لا توجد بطاقات';
+                    flashcardBack.textContent = '...';
+                    return;
+                }
+                if (currentCardIndex >= currentFlashcards.length) {
+                    currentCardIndex = 0; // Loop back to the start
+                }
+                const cardData = currentFlashcards[currentCardIndex];
+                
+                if(flashcard.classList.contains('is-flipped')){
+                   flashcard.classList.remove('is-flipped');
+                }
+
+                setTimeout(() => {
+                     flashcardFront.textContent = cardData.en;
+                     flashcardBack.textContent = cardData.ar;
+                }, 300); // Wait for flip animation
+
+                currentCardIndex++;
+            }
+            
+            const setupChallengeListeners = (parent) => {
+                parent.querySelectorAll('.challenge-container').forEach(challenge => {
+                    const lessonId = challenge.dataset.lessonId;
+                    const completeBtn = challenge.querySelector('.complete-challenge-btn');
+                    const feedback = challenge.querySelector('.challenge-feedback');
+
+                    if(completeBtn){
+                        if (isLessonCompleted(lessonId)) {
+                            completeBtn.textContent = 'تم إكمال التحدي';
+                            completeBtn.disabled = true;
+                            completeBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                        }
+
+                        completeBtn.addEventListener('click', () => {
+                            if (!isLessonCompleted(lessonId)) {
+                                markLessonAsComplete(lessonId);
+                                feedback.textContent = 'رائع! تم إكمال التحدي وإضافة 3 نقاط خبرة.';
+                                feedback.className = 'challenge-feedback mt-3 p-2 rounded-md bg-green-500/20 text-green-400';
+                                completeBtn.textContent = 'تم إكمال التحدي';
+                                completeBtn.disabled = true;
+                                completeBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            }
+                        });
+                    }
+                });
+            };
+
+            // This function generates the details page for a specific technology
+            const generateDetailsPage = (techName) => {
+                const details = techDetails[techName];
+                if (!details) return;
+
+                const escapeHTML = (str) => {
+                    const p = document.createElement("p");
+                    p.textContent = str;
+                    return p.innerHTML;
+                };
+                
+                const roadmapHTML = details.roadmap.map(item => `<div><button class="accordion-header"><span>${item.title}</span><span class="arrow">▼</span></button><div class="accordion-content"><p class="p-4">${item.content}</p></div></div>`).join('');
+                
+                const codeExamplesHTML = details.codeExamples.map(item => {
+                    const webCodeTypes = ['html', 'css', 'js', 'jsx', 'ts'];
+                    const tryItButton = webCodeTypes.includes(item.type)
+                        ? `<button class="try-it-btn bg-teal-600 hover:bg-teal-700 text-sm py-1 px-3 rounded" data-code-type="${item.type}" data-code="${encodeURIComponent(item.code)}">جرب بنفسك</button>`
+                        : '';
+
+                    return `
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-semibold">${item.title}</h4>
+                            ${tryItButton}
+                        </div>
+                        <div class="code-block"><pre><code>${escapeHTML(item.code)}</code></pre></div>
+                    </div>`;
+                }).join('');
+
+                const youtubeCoursesHTML = details.youtubeCourses.map(item => `<a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block"><div class="card p-0 overflow-hidden h-full"><img src="https://placehold.co/600x400/0f172a/e2e8f0?text=${item.imgText.replace(' ', '+')}" alt="${item.channel}" class="w-full h-32 object-cover"><div class="p-4"><h4 class="font-bold">${item.title}</h4><p class="text-sm text-gray-400">${item.channel}</p></div></div></a>`).join('');
+                
+                const challengeHTML = details.challenge ? `
+                    <div class="info-card challenge-container" data-lesson-id="${details.challenge.id}">
+                        <h3 class="text-xl mb-4">💡 ${details.challenge.title}</h3>
+                        <p class="mb-4">${details.challenge.description}</p>
+                        <div>
+                            <button class="accordion-header"><span>عرض الحل</span><span class="arrow">▼</span></button>
+                            <div class="accordion-content">
+                               <div class="p-4">
+                                    <div class="code-block mb-4"><pre><code>${escapeHTML(details.challenge.solution)}</code></pre></div>
+                                    <div class="text-center">
+                                        <button class="complete-challenge-btn bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg">أكملت التحدي</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="challenge-feedback mt-3"></div>
+                    </div>` : '';
+
+                detailsContent.innerHTML = `<div class="flex items-center mb-6"><span class="text-5xl ml-3">${details.icon}</span><h2 class="text-3xl font-bold">${details.title}</h2></div><div class="info-card"><h3 class="text-xl mb-2">📖 مقدمة</h3><p>${details.introduction}</p></div><div class="info-card"><h3 class="text-xl mb-2">💡 مجالات الاستخدام</h3><p>${details.usage}</p></div><div class="info-card"><h3 class="text-xl mb-4">🗺️ خريطة طريق التعلم</h3><div class="space-y-2">${roadmapHTML}</div></div><div class="info-card"><h3 class="text-xl mb-4">📝 أمثلة كود</h3><div class="space-y-4">${codeExamplesHTML}</div></div>${challengeHTML}<div class="info-card"><h3 class="text-xl mb-4">🎬 كورسات يوتيوب</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">${youtubeCoursesHTML}</div></div>`;
+                setupAccordionListeners(detailsContent);
+                setupQuizListeners(detailsContent);
+                setupChallengeListeners(detailsContent);
+                detailsContent.querySelectorAll('.try-it-btn').forEach(btn => {
+                    btn.addEventListener('click', () => openPlayground(btn));
+                });
+            };
+
+            const renderSkillTree = () => {
+                const container = document.getElementById('skill-tree-container');
+                const xpCountEl = document.getElementById('xp-count');
+                const badgesCountEl = document.getElementById('badges-count');
+                const dailyStreakEl = document.getElementById('daily-streak');
+                if (!container || !xpCountEl || !badgesCountEl || !dailyStreakEl) return;
+
+                let totalXP = 0;
+                let totalBadges = 0;
+                
+                let treeHTML = Object.values(learningPathData).map(path => {
+                    const completedStepsCount = path.steps.filter(s => s.completed).length;
+                    const isPathComplete = completedStepsCount === path.steps.length;
+                    totalXP += completedStepsCount * 3;
+                    if (isPathComplete) totalBadges++;
+
+                    let previousNodeUnlocked = true;
+                    const branchHTML = path.steps.map(step => {
+                        let nodeClass = 'locked';
+                        if (step.completed) {
+                            nodeClass = 'completed';
+                        } else if (previousNodeUnlocked) {
+                            nodeClass = 'unlocked';
+                            previousNodeUnlocked = false; // The next one will be locked until this one is complete
+                        }
+                        
+                        // After checking, update previousNodeUnlocked for the next iteration
+                        if (step.completed) previousNodeUnlocked = true;
+
+                        return `<div class="skill-node ${nodeClass}" data-lesson-id="${step.lessonId}">
+                                    <div class="node-icon">${step.icon}</div>
+                                    <div class="font-semibold">${step.title}</div>
+                                </div>`;
+                    }).join('<div class="skill-connector connector-horizontal"></div>');
+
+                    return `
+                        <div class="info-card">
+                            <h3 class="text-2xl mb-4">${path.title}</h3>
+                            <div class="skill-tree">
+                                <div class="skill-branch">
+                                    ${branchHTML}
+                                </div>
+                            </div>
+                        </div>`;
+                }).join('');
+
+                container.innerHTML = treeHTML;
+                 xpCountEl.textContent = totalXP;
+                badgesCountEl.innerHTML = `🏅 ${totalBadges}`;
+
+                // Add event listeners to skill tree nodes
+                container.querySelectorAll('.skill-node.unlocked').forEach(node => {
+                    node.addEventListener('click', () => {
+                        const lessonId = node.dataset.lessonId;
+                         if (webTech.includes(lessonId)) {
+                            generateDetailsPage(lessonId);
+                            switchView('details-view');
+                        } else {
+                             // This part handles navigation for English lessons
+                            let targetSubviewId = 'english-grammar-accordions-container';
+                            let targetViewId = 'english-general-view';
+                            
+                            if (listeningExercises.some(ex => ex.id === lessonId)) {
+                                targetViewId = 'listening-view';
+                            } else if (idiomsData.some(ex => ex.id === lessonId) || lessonId === 'idioms1') {
+                                targetViewId = 'idioms-view';
+                            }
+                            
+                            switchView(targetViewId);
+
+                            if(targetViewId === 'english-general-view') {
+                                 setTimeout(() => {
+                                    document.querySelectorAll('.english-sub-view').forEach(sv => sv.classList.add('hidden'));
+                                    const subview = document.getElementById(targetSubviewId);
+                                    if(subview) subview.classList.remove('hidden');
+
+                                    const headers = subview.querySelectorAll('.accordion-header');
+                                    headers.forEach(h => {
+                                        if(h.textContent.trim().includes(lessonId)){
+                                            if (!h.classList.contains('active')) h.click();
+                                            h.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        }
+                                    });
+                                 }, 100);
+                            }
+                        }
+                    });
+                });
+
+                // Daily Streak Logic (you might want to refactor this into its own function)
+                const today = new Date().toDateString();
+                const lastVisit = localStorage.getItem('lastVisit');
+                let streak = parseInt(localStorage.getItem('dailyStreak') || '0');
+                if(lastVisit !== today) {
+                    if (lastVisit) {
+                        const lastVisitDate = new Date(lastVisit);
+                        const yesterday = new Date();
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        if (lastVisitDate.toDateString() === yesterday.toDateString()) {
+                            streak++;
+                        } else {
+                            streak = 1;
+                        }
+                    } else {
+                        streak = 1;
+                    }
+                    localStorage.setItem('lastVisit', today);
+                    localStorage.setItem('dailyStreak', streak.toString());
+                }
+                dailyStreakEl.innerHTML = `🔥 ${streak}`;
+            };
+
+
+            // --- Event Listeners ---
+            const sidebar = document.getElementById('sidebar');
+            const openSidebarBtn = document.getElementById('open-sidebar');
+            const closeSidebarBtn = document.getElementById('close-sidebar');
+            const navLinks = document.querySelectorAll('#main-nav a');
+            const views = document.querySelectorAll('.view');
+            const detailsContent = document.getElementById('details-content');
+            const webDevGrid = document.getElementById('web-dev-grid');
+            
+            openSidebarBtn.addEventListener('click', () => sidebar.classList.remove('sidebar-hidden'));
+            closeSidebarBtn.addEventListener('click', () => sidebar.classList.add('sidebar-hidden'));
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchView(link.dataset.view);
+                    if (window.innerWidth < 768) sidebar.classList.add('sidebar-hidden');
+                });
+            });
+
+             document.querySelectorAll('.back-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const targetViewId = e.currentTarget.dataset.target;
+                    switchView(targetViewId);
+                });
+            });
+
+
+            webDevGrid.addEventListener('click', (e) => {
+                const card = e.target.closest('.card');
+                if (card) {
+                    generateDetailsPage(card.dataset.tech);
+                    switchView('details-view');
+                }
+            });
+            
+            document.querySelectorAll('#english-general-view .category-card').forEach(card => {
+                card.addEventListener('click', e => {
+                    e.preventDefault();
+                    const subviewId = card.dataset.subview;
+                    const navViewId = card.dataset.navView;
+                    if(subviewId) {
+                        document.querySelectorAll('.english-sub-view').forEach(sv => {
+                            sv.id === `${subviewId}-container` ? sv.classList.remove('hidden') : sv.classList.add('hidden');
+                        });
+                    } else if (navViewId) {
+                        switchView(navViewId);
+                    }
+                });
+            });
+            
+            // --- Initial Page Load ---
+            if (webDevGrid) {
+                webDevGrid.innerHTML = webTech.map(createCard).join('');
+            }
+            generateEnglishGrammarPage();
+            generateEnglishGeneralPage();
+            generateProjectsPage();
+            generateListeningPage();
+            generateIdiomsPage();
+            generateCareerPrepPage();
+            renderSkillTree(); 
+            setupFlashcards();
+            switchView('main-view');
+        });
+    </script>
+</body>
+</html>
+
